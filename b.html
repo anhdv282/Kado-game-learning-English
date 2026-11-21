@@ -1,0 +1,1758 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Leo Tháp 100 Tầng & Phòng Luyện Viết - Pixel Knight Pro</title>
+  <style>
+    :root {
+      --bg: #090d16;
+      --panel: #161d2f;
+      --border: #3b4764;
+      --accent: #fbbf24;
+      --danger: #ef4444;
+      --success: #10b981;
+      --info: #38bdf8;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Courier New', Consolas, monospace;
+      background: radial-gradient(circle at top, #151b30, var(--bg));
+      color: var(--text);
+      min-height: 100vh;
+      padding: 14px 12px 48px;
+      line-height: 1.45;
+    }
+
+    .container { max-width: 900px; margin: 0 auto; }
+
+    .px-box {
+      background: var(--panel);
+      border: 3px solid var(--border);
+      box-shadow: 0 6px 0 #05070c, inset 0 0 0 2px #0f1524;
+      border-radius: 6px;
+    }
+
+    .header { text-align: center; margin-bottom: 12px; }
+    .header h1 { font-size: 21px; color: var(--accent); text-shadow: 2px 2px 0 #000; }
+    .header p { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+    /* Mode Switcher */
+    .mode-nav {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .mode-btn {
+      padding: 11px 14px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 900;
+      background: #111827;
+      color: var(--muted);
+      border: 3px solid #334155;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #05070c;
+      transition: 0.15s;
+    }
+    .mode-btn.active {
+      background: linear-gradient(180deg, #1e293b, #0f172a);
+      color: var(--accent);
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    /* HUD */
+    .hud {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    .hud-item {
+      background: #0c111e;
+      border: 2px solid #26314a;
+      padding: 6px;
+      text-align: center;
+      border-radius: 4px;
+    }
+    .hud-label { font-size: 10px; color: var(--muted); text-transform: uppercase; }
+    .hud-val { font-size: 13.5px; font-weight: 700; margin-top: 2px; }
+
+    /* Toolbar */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .btn-px {
+      background: #1e293b;
+      color: #fff;
+      border: 2px solid #475569;
+      padding: 6px 10px;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      border-radius: 4px;
+      box-shadow: 0 3px 0 #0f172a;
+    }
+    .btn-px:hover { border-color: var(--accent); }
+    .btn-px:active { transform: translateY(2px); box-shadow: 0 1px 0 #0f172a; }
+    .btn-px.off { opacity: 0.55; }
+    .btn-settings { background: #312e81; border-color: #818cf8; }
+
+    /* Tower Map */
+    .tower-map {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 5px;
+      margin-bottom: 12px;
+    }
+    .floor-pill {
+      background: #111827;
+      border: 2px solid #27324a;
+      padding: 5px 2px;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      border-radius: 4px;
+    }
+    .floor-pill.active { border-color: var(--accent); color: var(--accent); background: #29200b; transform: translateY(-2px); }
+    .floor-pill.done { border-color: var(--success); color: var(--success); background: #0a261d; }
+
+    /* BATTLE ARENA */
+    .arena {
+      position: relative;
+      height: 220px;
+      margin-bottom: 12px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #101526 0%, #1c2238 68%, #2e2638 68%, #1a1522 100%);
+      border: 3px solid #475569;
+      box-shadow: 0 6px 0 #05070c, inset 0 0 36px rgba(0,0,0,0.75);
+      border-radius: 6px;
+    }
+    .arena::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 32% 0;
+      background-image:
+        repeating-linear-gradient(0deg, rgba(0,0,0,0.25) 0px, rgba(0,0,0,0.25) 2px, transparent 2px, transparent 24px),
+        repeating-linear-gradient(90deg, rgba(0,0,0,0.2) 0px, rgba(0,0,0,0.2) 2px, transparent 2px, transparent 48px);
+      pointer-events: none;
+    }
+    .arena-floor-line {
+      position: absolute; left: 0; right: 0; top: 68%;
+      height: 5px; background: #524366; box-shadow: 0 2px 0 #1e1829;
+    }
+    .arena-shake { animation: arenaShake 0.32s ease; }
+    @keyframes arenaShake {
+      0%, 100% { transform: translate(0, 0); }
+      20% { transform: translate(-6px, 3px); }
+      40% { transform: translate(6px, -3px); }
+      60% { transform: translate(-4px, -2px); }
+      80% { transform: translate(4px, 2px); }
+    }
+
+    .torch {
+      position: absolute; top: 20px; width: 14px; height: 28px;
+      background: #451a03; border: 2px solid #78350f; z-index: 2;
+    }
+    .torch::after {
+      content: ""; position: absolute; top: -12px; left: -1px;
+      width: 12px; height: 12px; background: #fbbf24;
+      box-shadow: 0 0 22px 8px rgba(245, 158, 11, 0.55);
+      animation: flicker 0.28s infinite alternate;
+    }
+    .torch.left { left: 17%; }
+    .torch.right { right: 17%; }
+    @keyframes flicker {
+      from { transform: scale(1); background: #f59e0b; }
+      to { transform: scale(1.18); background: #fef08a; }
+    }
+    .ambient-ember {
+      position: absolute; width: 4px; height: 4px;
+      background: rgba(251, 191, 36, 0.45); pointer-events: none; z-index: 3;
+      animation: emberRise linear infinite;
+    }
+    @keyframes emberRise {
+      0% { transform: translateY(0) scale(1); opacity: 0; }
+      20% { opacity: 0.7; }
+      100% { transform: translateY(-130px) translateX(18px) scale(0.3); opacity: 0; }
+    }
+
+    .fighters-hud {
+      position: relative; z-index: 5; display: flex;
+      justify-content: space-between; padding: 10px 14px 0; gap: 14px;
+    }
+    .fighter-stat { width: 45%; }
+    .fighter-name {
+      font-size: 12px; font-weight: 700; margin-bottom: 4px;
+      display: flex; justify-content: space-between; text-shadow: 1px 1px 0 #000;
+    }
+    .hp-bar-outer {
+      position: relative; height: 15px; background: #090d16;
+      border: 2px solid #000; padding: 1px; overflow: hidden;
+    }
+    .hp-bar-trail {
+      position: absolute; left: 1px; top: 1px; bottom: 1px;
+      background: #fef08a; transition: width 0.75s ease 0.15s;
+    }
+    .hp-bar-inner { position: relative; z-index: 2; height: 100%; transition: width 0.25s ease; }
+    .hp-hero { background: linear-gradient(90deg, #059669, #34d399); }
+    .hp-monster { background: linear-gradient(90deg, #b91c1c, #f87171); }
+
+    .stage-sprites {
+      position: relative; z-index: 6; height: 136px;
+      display: flex; justify-content: space-between; align-items: flex-end;
+      padding: 0 11% 14px;
+    }
+    .sprite-wrap {
+      position: relative; width: 90px; height: 90px;
+      display: flex; align-items: flex-end; justify-content: center;
+      transition: transform 0.16s cubic-bezier(0.2, 0.9, 0.3, 1);
+    }
+    .sprite-shadow {
+      position: absolute; bottom: -4px; width: 64px; height: 10px;
+      background: rgba(0,0,0,0.55); border-radius: 50%; z-index: -1;
+    }
+    .hero-idle { animation: heroBob 0.85s infinite ease-in-out; }
+    .monster-idle { animation: monsterBob 1.1s infinite ease-in-out; }
+    @keyframes heroBob {
+      0%, 100% { transform: translateY(0) scaleY(1); }
+      50% { transform: translateY(-4px) scaleY(1.03); }
+    }
+    @keyframes monsterBob {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-5px) scale(1.04, 0.97); }
+    }
+
+    .hero-charge { transform: translateX(-18px) scale(1.05, 0.94) !important; }
+    .hero-dash { transform: translateX(220px) scale(1.14) !important; filter: drop-shadow(0 0 12px #38bdf8); }
+    .hero-dash-crit { transform: translateX(225px) scale(1.22) !important; filter: drop-shadow(0 0 18px #fbbf24); }
+    .hero-knockback { transform: translateX(-28px) rotate(-8deg) !important; filter: brightness(2.2) drop-shadow(0 0 12px #ef4444); }
+    .hero-heal { filter: drop-shadow(0 0 14px #10b981); transform: translateY(-8px) scale(1.08); }
+
+    .monster-windup { transform: translateX(14px) scale(1.08, 0.93) !important; filter: brightness(1.3); }
+    .monster-lunge { transform: translateX(-46px) scale(1.12) !important; }
+    .monster-hit { animation: monsterShake 0.36s ease; filter: brightness(2.5) saturate(1.8) drop-shadow(0 0 10px #fff); }
+    .monster-dead { animation: dieAnim 0.75s forwards; }
+    @keyframes monsterShake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(14px) rotate(6deg); }
+      50% { transform: translateX(-10px) rotate(-4deg); }
+      75% { transform: translateX(8px); }
+    }
+    @keyframes dieAnim {
+      0% { transform: scale(1); opacity: 1; }
+      35% { transform: scale(1.25) rotate(10deg); filter: brightness(3.5); opacity: 0.9; }
+      100% { transform: scale(0) translateY(30px) rotate(-25deg); opacity: 0; }
+    }
+
+    .fx-slash, .fx-slash-crit { position: absolute; right: 12%; bottom: 24px; z-index: 14; pointer-events: none; }
+    .fx-slash { animation: slashPop 0.34s ease-out forwards; }
+    .fx-slash-crit { animation: slashCrit 0.42s ease-out forwards; }
+    @keyframes slashPop {
+      0% { transform: scale(0.3) rotate(-30deg); opacity: 1; }
+      60% { transform: scale(1.25) rotate(10deg); opacity: 1; }
+      100% { transform: scale(1.45) rotate(22deg); opacity: 0; }
+    }
+    @keyframes slashCrit {
+      0% { transform: scale(0.4) rotate(-45deg); opacity: 1; filter: drop-shadow(0 0 12px #fbbf24); }
+      50% { transform: scale(1.5) rotate(15deg); opacity: 1; }
+      100% { transform: scale(1.8) rotate(35deg); opacity: 0; }
+    }
+
+    .fx-fireball {
+      position: absolute; right: 22%; bottom: 42px; z-index: 14; pointer-events: none;
+      filter: drop-shadow(0 0 10px #f97316); animation: fireFly 0.46s linear forwards;
+    }
+    @keyframes fireFly {
+      0% { right: 22%; transform: scale(0.85); opacity: 1; }
+      85% { right: 74%; transform: scale(1.3); opacity: 1; }
+      100% { right: 78%; transform: scale(1.75); opacity: 0; }
+    }
+
+    .px-particle {
+      position: absolute; width: 7px; height: 7px; z-index: 16; pointer-events: none;
+      animation: pxBurst 0.55s ease-out forwards;
+    }
+    @keyframes pxBurst {
+      0% { transform: translate(0, 0) scale(1); opacity: 1; }
+      100% { transform: translate(var(--dx), var(--dy)) scale(0.2); opacity: 0; }
+    }
+
+    .float-dmg {
+      position: absolute; top: -16px; font-size: 15px; font-weight: 900;
+      text-shadow: 2px 2px 0 #000; z-index: 18; pointer-events: none;
+      animation: floatUp 0.95s ease-out forwards; white-space: nowrap;
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(0) scale(0.8); opacity: 1; }
+      30% { transform: translateY(-12px) scale(1.15); opacity: 1; }
+      100% { transform: translateY(-38px) scale(1); opacity: 0; }
+    }
+
+    /* TIMER BAR */
+    .timer-row {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+      background: #0c111e; padding: 8px 10px; border: 2px solid #26314a; border-radius: 4px;
+    }
+    .timer-label { font-size: 13px; font-weight: 900; min-width: 72px; color: var(--info); }
+    .timer-label.warn { color: var(--accent); }
+    .timer-label.crit { color: var(--danger); animation: pulseText 0.5s infinite alternate; }
+    @keyframes pulseText { from { opacity: 1; } to { opacity: 0.4; } }
+    .timer-track { flex: 1; height: 10px; background: #1e293b; border: 1px solid #000; overflow: hidden; }
+    .timer-fill { height: 100%; background: var(--info); transition: width 0.25s linear, background-color 0.3s; }
+
+    /* QUESTION PANEL */
+    .q-panel { padding: 16px; }
+    .floor-head {
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 8px; margin-bottom: 10px;
+      border-bottom: 2px dashed #334155; padding-bottom: 8px;
+    }
+    .floor-title { font-size: 15.5px; font-weight: 700; color: var(--accent); }
+    .floor-topic { font-size: 12px; color: var(--muted); }
+
+    .q-pips { display: flex; gap: 5px; margin-bottom: 12px; flex-wrap: wrap; }
+    .pip {
+      flex: 1; min-width: 24px; height: 22px; background: #0c111e;
+      border: 2px solid #2b3650; display: flex; align-items: center;
+      justify-content: center; font-size: 11px; font-weight: 700; border-radius: 4px; color: var(--muted);
+    }
+    .pip.curr { border-color: var(--accent); color: var(--accent); background: #261e09; }
+    .pip.ok { border-color: var(--success); background: #0c2c21; color: #6ee7b7; }
+    .pip.err { border-color: var(--danger); background: #331015; color: #fca5a5; }
+
+    .badges-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; align-items: center; }
+    .stage-tag { display: inline-block; font-size: 11.5px; font-weight: 700; padding: 3px 9px; border-radius: 4px; }
+    .tag-monster { background: #0c2d48; color: #7dd3fc; border: 1px solid #0284c7; }
+    .tag-boss { background: #3f1116; color: #fca5a5; border: 1px solid #dc2626; }
+    .tag-finish { background: #3b2307; color: #fde047; border: 1px solid #f59e0b; }
+    .tag-hard { background: #3b0764; color: #e9d5ff; border: 1px solid #a855f7; }
+    .tag-easy { background: #064e3b; color: #a7f3d0; border: 1px solid #10b981; }
+    .tag-listen { background: #1e3a8a; color: #bfdbfe; border: 1px solid #3b82f6; }
+
+    /* REAL AUDIO PLAYER BOX */
+    .listen-box {
+      background: #0c1427;
+      border: 2px solid #3b82f6;
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 12px;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+    }
+    .listen-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .listen-audio-el {
+      width: 100%;
+      height: 38px;
+      outline: none;
+      border-radius: 4px;
+    }
+    .listen-pick-btn {
+      background: #1d4ed8;
+      color: #fff;
+      border: 2px solid #93c5fd;
+      padding: 6px 12px;
+      border-radius: 5px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .listen-status { font-size: 12.5px; color: #93c5fd; margin-top: 6px; }
+
+    .context-box {
+      background: #0b1120; border-left: 4px solid var(--info);
+      padding: 10px 12px; margin-bottom: 12px; border-radius: 4px;
+      font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 14px; color: #cbd5e1;
+    }
+
+    .question-text {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      font-size: 16.5px; font-weight: 600; margin-bottom: 14px; color: #fff;
+    }
+    .blank {
+      display: inline-block; min-width: 68px; border-bottom: 2px dashed var(--accent);
+      text-align: center; color: var(--accent); padding: 0 6px;
+    }
+
+    .options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .opt-btn {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: #0f1626; border: 2px solid #334155; color: #f8fafc;
+      padding: 11px 13px; font-size: 14.5px; font-weight: 600;
+      text-align: left; cursor: pointer; border-radius: 6px;
+      box-shadow: 0 3px 0 #070a12; transition: 0.12s;
+    }
+    .opt-btn:hover:not(:disabled) { border-color: var(--info); background: #17233b; transform: translateY(-2px); }
+    .opt-btn:disabled { cursor: default; }
+    .opt-btn.right-ans { border-color: var(--success); background: #0b3326; color: #6ee7b7; }
+    .opt-btn.wrong-ans { border-color: var(--danger); background: #3b1116; color: #fca5a5; }
+
+    .boss-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .fill-input {
+      flex: 1; min-width: 200px; padding: 11px 12px;
+      font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 15px;
+      background: #090d16; color: #fff; border: 2px solid #475569;
+      border-radius: 6px; outline: none;
+    }
+    .fill-input:focus { border-color: var(--accent); }
+    .btn-attack {
+      background: linear-gradient(180deg, #f59e0b, #d97706); color: #090d16;
+      border: 2px solid #fde047; padding: 10px 18px; font-family: inherit;
+      font-weight: 900; font-size: 14px; cursor: pointer; border-radius: 6px; box-shadow: 0 3px 0 #78350f;
+    }
+    .btn-attack:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-hint {
+      background: #1e293b; color: var(--accent); border: 2px solid #f59e0b;
+      padding: 10px 12px; font-family: inherit; font-weight: 700;
+      font-size: 12.5px; cursor: pointer; border-radius: 6px;
+    }
+    .btn-hint:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .feedback-box {
+      margin-top: 14px; padding: 12px 14px; border-radius: 6px;
+      font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 14px; animation: fadeSlide 0.25s ease;
+    }
+    @keyframes fadeSlide { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .feedback-box.ok { background: #0a2b20; border: 2px solid var(--success); color: #a7f3d0; }
+    .feedback-box.err { background: #311014; border: 2px solid var(--danger); color: #fecaca; }
+
+    .next-wrap { margin-top: 14px; display: flex; gap: 10px; }
+    .btn-big {
+      width: 100%; padding: 13px 18px; font-family: inherit; font-size: 15px;
+      font-weight: 900; border-radius: 6px; cursor: pointer; border: 2px solid;
+    }
+    .btn-next { background: #0284c7; border-color: #7dd3fc; color: #fff; box-shadow: 0 4px 0 #0c4a6e; }
+    .btn-clear { background: #10b981; border-color: #6ee7b7; color: #052e16; box-shadow: 0 4px 0 #064e3b; }
+    .btn-retry { background: #ef4444; border-color: #fca5a5; color: #fff; box-shadow: 0 4px 0 #7f1d1d; }
+
+    /* WRITING PRACTICE ROOM */
+    .writing-panel { padding: 18px; font-family: 'Segoe UI', Tahoma, sans-serif; }
+    .w-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 16px; }
+    .w-tab {
+      background: #0c111e; border: 2px solid #2b3650; color: var(--muted);
+      padding: 8px 6px; font-size: 12px; font-weight: 700; border-radius: 5px;
+      cursor: pointer; text-align: center;
+    }
+    .w-tab.active { border-color: var(--accent); color: var(--accent); background: #261e09; }
+    .w-tab.done { border-color: var(--success); color: #6ee7b7; }
+    .w-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+    .w-card { background: #0c111e; border: 2px solid #26314a; border-radius: 6px; padding: 12px; }
+    .w-card h4 { font-family: 'Courier New', monospace; font-size: 13.5px; color: var(--info); margin-bottom: 8px; }
+    .w-guide-list { padding-left: 18px; font-size: 13.5px; color: #e2e8f0; }
+    .w-guide-list li { margin-bottom: 4px; }
+    .check-item { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; margin-bottom: 7px; color: #cbd5e1; }
+    .check-badge { font-weight: 800; font-size: 12px; padding: 1px 6px; border-radius: 4px; white-space: nowrap; }
+    .cb-pass { background: #064e3b; color: #6ee7b7; border: 1px solid #10b981; }
+    .cb-wait { background: #1e293b; color: #94a3b8; border: 1px solid #475569; }
+    .w-editor-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+    .word-counter { font-family: 'Courier New', monospace; font-weight: 800; font-size: 13.5px; padding: 4px 10px; border-radius: 4px; background: #0c111e; border: 2px solid #334155; }
+    .word-counter.ok { border-color: var(--success); color: #6ee7b7; }
+    .word-counter.low { border-color: var(--accent); color: var(--accent); }
+    .w-textarea {
+      width: 100%; min-height: 170px; background: #090d16; color: #f8fafc;
+      border: 2px solid #475569; border-radius: 6px; padding: 12px;
+      font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 15px; line-height: 1.6; resize: vertical; outline: none;
+    }
+    .w-textarea:focus { border-color: var(--accent); }
+    .w-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .sample-box { margin-top: 14px; background: #0b1324; border: 2px dashed #38bdf8; border-radius: 6px; padding: 12px 14px; }
+    .sample-box h4 { color: var(--info); font-size: 14px; margin-bottom: 6px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
+    .sample-box p { font-size: 14.5px; color: #e2e8f0; line-height: 1.6; }
+
+    /* MODAL SETTINGS */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.78);
+      z-index: 100; display: flex; align-items: center; justify-content: center; padding: 16px;
+    }
+    .modal-box { width: 100%; max-width: 520px; padding: 20px; max-height: 90vh; overflow-y: auto; }
+    .modal-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #334155; padding-bottom: 10px; margin-bottom: 14px; }
+    .modal-head h3 { color: var(--accent); font-size: 18px; }
+    .setting-group { margin-bottom: 14px; font-family: 'Segoe UI', Tahoma, sans-serif; }
+    .setting-group label { display: block; font-weight: 700; font-size: 13.5px; margin-bottom: 6px; color: #e2e8f0; }
+    .preset-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+    .preset-btn { background: #0f172a; border: 2px solid #334155; color: #fff; padding: 6px 10px; border-radius: 5px; cursor: pointer; font-size: 12.5px; font-weight: 700; }
+    .preset-btn.active { border-color: var(--accent); background: #29200b; color: var(--accent); }
+    .setting-input { width: 100%; padding: 8px 10px; background: #090d16; border: 2px solid #475569; color: #fff; border-radius: 5px; font-size: 14px; }
+    .small-note { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+    .victory-box { text-align: center; padding: 34px 20px; }
+    .victory-box h2 { color: var(--accent); font-size: 24px; margin-bottom: 10px; }
+    .hidden { display: none !important; }
+
+    @media (max-width: 640px) {
+      .hud { grid-template-columns: 1fr 1fr; }
+      .options, .w-grid { grid-template-columns: 1fr; }
+      .w-tabs { grid-template-columns: 1fr 1fr; }
+      .tower-map { grid-template-columns: repeat(5, 1fr); }
+      .stage-sprites { padding: 0 5% 14px; }
+      .hero-dash, .hero-dash-crit { transform: translateX(105px) scale(1.08) !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>⚔️ LEO THÁP 100 TẦNG & PHÒNG LUYỆN VIẾT ⚔️</h1>
+      <p>Global Stage 5 (Units 1-4) • Đấu Trường Pixel • Listening File Gốc • Writing Tasks 1–6</p>
+    </div>
+
+    <!-- Mode Switcher -->
+    <div class="mode-nav">
+      <button class="mode-btn active" id="tab-tower-btn" onclick="switchMode('tower')">⚔️ ĐẤU TRƯỜNG LEO THÁP (100 CÂU)</button>
+      <button class="mode-btn" id="tab-writing-btn" onclick="switchMode('writing')">✍️ PHÒNG LUYỆN VIẾT (TASKS 1–6)</button>
+    </div>
+
+    <!-- HUD -->
+    <div class="hud px-box">
+      <div class="hud-item">
+        <div class="hud-label">Tầng Hiện Tại</div>
+        <div class="hud-val" style="color:var(--info);" id="hud-floor">Tầng 1 / 10</div>
+      </div>
+      <div class="hud-item">
+        <div class="hud-label">Máu Hero</div>
+        <div class="hud-val" id="hud-hearts">❤️❤️❤️ (3/3)</div>
+      </div>
+      <div class="hud-item">
+        <div class="hud-label">Điểm Chiến Công</div>
+        <div class="hud-val" style="color:var(--accent);" id="hud-score">0 điểm</div>
+      </div>
+      <div class="hud-item">
+        <div class="hud-label">Gợi Ý & Combo</div>
+        <div class="hud-val" style="color:#6ee7b7;" id="hud-combo">🃏 0 | 🔥 0/5</div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div style="display:flex; gap:6px; flex-wrap:wrap;">
+        <button class="btn-px btn-settings" onclick="openSettings()">⚙️ Cài đặt (<span id="tb-time-badge">30s</span>)</button>
+        <button class="btn-px" id="bgm-btn" onclick="toggleBGM()">🎵 Nhạc nền: BẬT</button>
+        <button class="btn-px" id="sfx-btn" onclick="toggleSFX()">🔊 Hiệu ứng: BẬT</button>
+        <button class="btn-px" onclick="resetGame()">🔄 Chơi lại</button>
+      </div>
+    </div>
+
+    <!-- Hidden global file input for real listening audio -->
+    <input type="file" id="global-audio-picker" accept="audio/*" class="hidden" onchange="handleAudioFileUpload(event)" />
+
+    <!-- ==================== TOWER VIEW ==================== -->
+    <div id="tower-view">
+      <div class="tower-map" id="tower-map"></div>
+
+      <div class="arena" id="arena">
+        <div class="torch left"></div>
+        <div class="torch right"></div>
+        <div class="arena-floor-line"></div>
+
+        <div class="fighters-hud">
+          <div class="fighter-stat">
+            <div class="fighter-name">
+              <span style="color:#7dd3fc;">🛡️ HIỆP SĨ</span>
+              <span id="hero-hp-text">3 / 3 ❤️</span>
+            </div>
+            <div class="hp-bar-outer">
+              <div class="hp-bar-trail" id="hero-hp-trail" style="width:100%;"></div>
+              <div class="hp-bar-inner hp-hero" id="hero-hp-bar" style="width:100%;"></div>
+            </div>
+          </div>
+          <div class="fighter-stat">
+            <div class="fighter-name">
+              <span style="color:#fca5a5;" id="monster-name-label">👾 QUÁI VẬT</span>
+              <span id="monster-hp-text">100 / 100 HP</span>
+            </div>
+            <div class="hp-bar-outer">
+              <div class="hp-bar-trail" id="monster-hp-trail" style="width:100%;"></div>
+              <div class="hp-bar-inner hp-monster" id="monster-hp-bar" style="width:100%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stage-sprites" id="stage-sprites">
+          <div class="sprite-wrap hero-idle" id="hero-sprite"></div>
+          <div class="sprite-wrap monster-idle" id="monster-sprite"></div>
+        </div>
+      </div>
+
+      <div class="q-panel px-box" id="game-card">
+        <div class="floor-head">
+          <div>
+            <div class="floor-title" id="floor-title"></div>
+            <div class="floor-topic" id="floor-topic"></div>
+          </div>
+          <div style="font-size:12px; color:var(--accent); font-weight:700;" id="q-counter">Câu 1 / 10</div>
+        </div>
+
+        <div class="q-pips" id="q-pips"></div>
+
+        <div class="timer-row" id="timer-row">
+          <div class="timer-label" id="timer-label">⏳ 30s</div>
+          <div class="timer-track">
+            <div class="timer-fill" id="timer-fill" style="width:100%;"></div>
+          </div>
+        </div>
+
+        <div id="question-area"></div>
+      </div>
+
+      <div class="px-box victory-box hidden" id="victory-card">
+        <div id="victory-hero-wrap" style="display:flex; justify-content:center; margin-bottom:14px;"></div>
+        <h2>🏆 CHIẾN THẮNG ĐỈNH THÁP!</h2>
+        <p style="font-family:sans-serif; font-size:15px; margin-bottom:10px;">
+          Hiệp sĩ đã tiêu diệt toàn bộ 10 Quái vật và chinh phục 100 câu hỏi nâng cao Stage 5!
+        </p>
+        <p style="font-size:20px; font-weight:900; color:var(--success); margin-bottom:20px;" id="final-score-text"></p>
+        <button class="btn-big btn-clear" style="max-width:280px;" onclick="resetGame()">🔄 Chơi Lại Từ Tầng 1</button>
+      </div>
+    </div>
+
+    <!-- ==================== WRITING PRACTICE ROOM ==================== -->
+    <div id="writing-view" class="px-box writing-panel hidden">
+      <div class="floor-head">
+        <div>
+          <div class="floor-title">✍️ PHÒNG RÈN BÚT & LUYỆN VIẾT (WRITING TASKS 1–6)</div>
+          <div class="floor-topic">Hoàn thành bài viết chuẩn 60+ từ & Checklist để nhận +25 điểm Chiến Công mỗi Task!</div>
+        </div>
+        <div style="font-size:12px; color:#6ee7b7; font-weight:700;" id="w-progress-badge">Đã hoàn thành: 0 / 8</div>
+      </div>
+
+      <div class="w-tabs" id="w-tabs"></div>
+
+      <div style="margin-bottom:12px;">
+        <div style="font-size:16px; font-weight:800; color:#fff;" id="w-task-title"></div>
+        <div style="font-size:13px; color:var(--accent); margin-top:2px;" id="w-task-note"></div>
+      </div>
+
+      <div class="w-grid">
+        <div class="w-card">
+          <h4>🧭 GUIDED QUESTIONS (Gợi ý ý tưởng)</h4>
+          <ol class="w-guide-list" id="w-guided-list"></ol>
+        </div>
+        <div class="w-card">
+          <h4>📋 WRITING CHECKLIST (Tự động chấm)</h4>
+          <div id="w-checklist"></div>
+        </div>
+      </div>
+
+      <div class="w-editor-head">
+        <span style="font-size:13.5px; font-weight:700; color:#e2e8f0;">📝 Bài viết tiếng Anh của bạn:</span>
+        <span class="word-counter low" id="w-word-counter">0 / 60 từ</span>
+      </div>
+
+      <textarea class="w-textarea" id="w-textarea" placeholder="Bắt đầu viết đoạn văn tiếng Anh của bạn tại đây..." oninput="onWritingInput()"></textarea>
+
+      <div class="w-actions">
+        <button class="btn-px" id="w-starter-btn" onclick="insertStarterSentence()">✨ Điền câu mở đầu gợi ý</button>
+        <button class="btn-px" onclick="toggleSampleWriting()">📖 Xem / Ẩn Bài Mẫu</button>
+        <button class="btn-attack" style="flex:1; min-width:200px;" onclick="submitWritingTask()">⚒️ Kiểm Tra & Lưu (+25 Điểm)</button>
+      </div>
+
+      <div id="w-feedback"></div>
+
+      <div class="sample-box hidden" id="w-sample-box">
+        <h4>
+          <span>🌟 BÀI MẪU THAM KHẢO (SAMPLE WRITING)</span>
+          <button class="btn-px" style="background:#1e3a8a; border-color:#60a5fa;" onclick="speakSampleWriting()">🔊 Đọc Bài Mẫu (AI)</button>
+        </h4>
+        <p id="w-sample-text"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS MODAL -->
+  <div class="modal-backdrop hidden" id="settings-modal">
+    <div class="modal-box px-box">
+      <div class="modal-head">
+        <h3>⚙️ CÀI ĐẶT TRÒ CHƠI</h3>
+        <button class="btn-px" onclick="closeSettings()">✖ Đóng</button>
+      </div>
+
+      <div class="setting-group">
+        <label>⏳ Thời gian trả lời mỗi câu (giây):</label>
+        <div class="preset-row" id="time-presets">
+          <button class="preset-btn" onclick="setPresetTime(15)">15s</button>
+          <button class="preset-btn" onclick="setPresetTime(25)">25s</button>
+          <button class="preset-btn" onclick="setPresetTime(30)">30s</button>
+          <button class="preset-btn" onclick="setPresetTime(45)">45s</button>
+          <button class="preset-btn" onclick="setPresetTime(60)">60s</button>
+          <button class="preset-btn" onclick="setPresetTime(0)">∞ Không giới hạn</button>
+        </div>
+        <input type="number" id="custom-time-input" class="setting-input" min="0" max="300" placeholder="Nhập số giây (0 = không giới hạn)" onchange="applyCustomTime(this.value)" />
+      </div>
+
+      <div class="setting-group">
+        <label>🎧 File Audio Listening Gốc (.mp3 / .wav / .m4a):</label>
+        <button class="btn-px" style="width:100%; background:#1d4ed8; border-color:#93c5fd; padding:10px;" onclick="document.getElementById('global-audio-picker').click()">📂 Chọn File Nghe Từ Máy Tính / Điện Thoại</button>
+        <div class="small-note" id="settings-audio-status">Mặc định tìm file tên <strong>listening.mp3</strong> cùng thư mục, hoặc bạn bấm nút trên để chọn file bất kỳ.</div>
+      </div>
+
+      <div class="setting-group">
+        <label>🔥 Phần thưởng khi đạt Combo x5:</label>
+        <select id="combo-mode" class="setting-input" onchange="updateSettingsState()">
+          <option value="auto">Ưu tiên hồi +1 ❤️ (nếu đủ tim thì nhận +1 🃏 Thẻ Gợi Ý)</option>
+          <option value="hint">Luôn nhận +1 🃏 Thẻ Gợi Ý</option>
+        </select>
+      </div>
+
+      <button class="btn-big btn-clear" onclick="closeSettings()">✔ Lưu & Tiếp Tục</button>
+    </div>
+  </div>
+
+<script>
+// ================= PIXEL ART ENGINE =================
+function makePixelSVG(grid, palette, size = 88) {
+  const rows = grid.length, cols = grid[0].length;
+  let rects = "";
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      const ch = grid[y][x];
+      if (ch !== "." && palette[ch]) rects += `<rect x="${x}" y="${y}" width="1" height="1" fill="${palette[ch]}"/>`;
+    }
+  }
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${cols} ${rows}" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">${rects}</svg>`;
+}
+
+const HERO_SPRITE = makePixelSVG([
+  ".....RRRR.......","....RRRRRR......","....SSSSSS......","...SSKKKKSS.....",
+  "...SSWWWWSS..S..","....SSSSSS...S..","..BBBBBBBB..SS..",".BBYYYYYYBB.SS..",
+  ".BYYSSSSYYB.YY..",".BYYSSSSYYB.P...","..BBYYYYBB..P...","...BBBBBB.......",
+  "...NN..NN.......","...NN..NN.......","..DDD..DDD......","................"
+], { R:"#ef4444",S:"#cbd5e1",K:"#0f172a",W:"#38bdf8",B:"#2563eb",Y:"#fbbf24",P:"#fed7aa",N:"#1e3a8a",D:"#475569" }, 88);
+
+const SLASH_SVG = makePixelSVG([
+  "..........WW",".........WWC","........WWC.",".......WWC..","......WWC...",
+  ".....WWC....","....WWC.....","...WWC......","..WWC.......",".WWC........","WWC.........","WC.........."
+], { W:"#ffffff", C:"#38bdf8" }, 84);
+
+const CRIT_SLASH_SVG = makePixelSVG([
+  "YY........WW",".YY......WWY","..YY....WWY.","...YY..WWY..","....YYWWY...",
+  "....WWYY....","...WWY.YY...","..WWY...YY..",".WWY.....YY.","WWY.......YY","WY.........Y","............"
+], { W:"#ffffff", Y:"#fbbf24" }, 94);
+
+const FIREBALL_SVG = makePixelSVG([
+  "....RRRR....","..RROOOORR..",".ROOYYYYOOR.","ROYYYYYYYYRR","ROYYYYWWYYOR",
+  "ROYYYYYYYYOR",".ROOYYYYOOR.","..RROOOORR..","....RRRR....","............"
+], { R:"#ef4444", O:"#f97316", Y:"#fde047", W:"#ffffff" }, 60);
+
+const MONSTER_PALETTES = [
+  { A:"#22c55e",B:"#15803d",E:"#fde047",K:"#090d16",C:"#fbbf24" },
+  { A:"#84cc16",B:"#4d7c0f",E:"#ef4444",K:"#090d16",C:"#92400e" },
+  { A:"#9333ea",B:"#581c87",E:"#ef4444",K:"#090d16",C:"#e2e8f0" },
+  { A:"#64748b",B:"#334155",E:"#ef4444",K:"#090d16",C:"#cbd5e1" },
+  { A:"#16a34a",B:"#14532d",E:"#f97316",K:"#090d16",C:"#94a3b8" },
+  { A:"#78716c",B:"#44403c",E:"#f97316",K:"#090d16",C:"#fbbf24" },
+  { A:"#38bdf8",B:"#1e3a8a",E:"#fef08a",K:"#090d16",C:"#e2e8f0" },
+  { A:"#a855f7",B:"#4c1d95",E:"#fbbf24",K:"#090d16",C:"#cbd5e1" },
+  { A:"#ea580c",B:"#7c2d12",E:"#fde047",K:"#090d16",C:"#f8fafc" },
+  { A:"#dc2626",B:"#7f1d1d",E:"#fde047",K:"#090d16",C:"#fbbf24" }
+];
+
+const MONSTER_GRIDS = [
+  [".....C.CC.C.....",".....CCCCCC.....","....AAAAAAAA....","...AAAAAAAAAA...","..AAAAAAAAAAAA..","..AAKKAAAAKKAA..","..AAKEAAAAKEAA..","..AAAAAAAAAAAA..",".AAAABBBBBBAAAA.",".AAABBBBBBBBAAA.",".AAAAAAAAAAAAAA.",".AABBBBBBBBBBAA.","..BBBBBBBBBBBB..","................","................","................"],
+  ["................",".AA..........AA.",".AAA..AAAA..AAA.","..AAAAAAAAAAAA..","...AAKKAAKKAA...","...AAKEAAKEAA...","...AAAAAAAAAA...","....AACCCCAA....","...CCCCCCCCCC...","..BBCCCCCCCCBB..","..B.CCCCCCCC.B..","....CCCCCCCC....","....BB....BB....","...BBB....BBB...","................","................"],
+  ["................","..AA........AA..",".AAAA..AA..AAAA.","AAAAAA.AA.AAAAAA","BBBBAAAAAAAAAAB.",".BBBAAKEEKAAAB..","..BBAAAAAAAAAB..","...BAAKCCKAAB...","....BAAAAAAAB...",".....BBBBBBB....","......BB.BB.....","......C...C.....","................","................","................","................"],
+  [".....CC..CC.....","....CCCC.CCC....","....CCCCCCCC....",".....AA..AA.....","....AAAAAAAA....","CCCCAAKEEKAA....","....AABBBBAA....",".....ABABABA....","....AABABABAA...","...AA.ABABA.AA..","..AA...AAA...AA.",".A......A......A","................","................","................","................"],
+  ["....CCCCCCCC....","...CCAAAAAACC...","...AAKKAAKKAA...","...AAKEAAKEAA...","...AACCCCCAAA...","..CCAAAAAAAAACC.",".CCCCBBBBBBCCCC.",".CCCBBBBBBBBCCC.",".CC.BBBBBBBB.CC.","....BBBBBBBB....","....CCC..CCC....","....BB....BB....","...CCC....CCC...","................","................","................"],
+  ["....AAAAAAAA....","...AAAAAAAAAA...","...AAEEAAEEAA...","..AAAABBBBAAAA..",".BBBBBBBBBBBBBB.",".BBAAEEEEEEAAAB.",".BBAAEEEEEEAAAB.",".BBBBBBBBBBBBBB.",".BB..BBBBBB..BB.",".BB..BBBBBB..BB.",".....BB..BB.....","....BBB..BBB....","...BBBB..BBBB...","................","................","................"],
+  [".....AAAAAA.....","....AAAAAAAA....","...AACCCCCCAA...","...ACKKCCKKCA...","...ACKECCKECA...","....ACCCCCCA....","...BBBBBBBBBB...","..BBBBAAAAABBB..","..BBBAAAAAAABBB.","...BBBBBBBBBB...","....BBBBBBBB....",".....BB..BB.....","....B......B....","................","................","................"],
+  ["..C..........C..",".AAA..AAAA..AAA.",".BBBBAAAAAAABBB.",".BBBAAKEEKAAABB.","..BBAAAAAAAAAB..","...BBBBBBBBBB...","..AAAAAAAAAAAA..",".BB.AAAAAAAA.BB.",".B..AABBBBAA..B.","....AA....AA....","....BB....BB....","...CCC....CCC...","................","................","................","................"],
+  ["..CC........CC..","...CC.AAAA.CC...","...AAAAAAAAAA...","...AAKEAAKEAA...","...AACCCCCAAA...","....AAAAAAAA....","..BBBBEEEEBBBB..",".BBBEEEEEEEEBBB.",".BB.EEEEEEEE.BB.","....BBBBBBBB....","....BB....BB....","...CCC....CCC...","................","................","................","................"],
+  [".C............C.",".CC..AAAAAA..CC.","..CCAAAAAAAAACC.","..BBAAKEEKAAABB.",".BBBBAAAAAAABBB.","BBBB.ACCCCAA.BBB","BBB..ACCCCAA..BB",".B...ACCCCAA...B",".....BBBBBBB....","....BBBB.BBBB...","....AAA...AAA...","...CCC.....CCC..","................","................","................","................"]
+];
+
+// ================= 8-BIT AUDIO ENGINE =================
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let actx = null;
+let bgmEnabled = true, sfxEnabled = true, bgmStarted = false, bgmTimer = null, bgmStep = 0;
+
+function ensureAudio() {
+  if (!AudioCtx) return null;
+  if (!actx) actx = new AudioCtx();
+  if (actx.state === "suspended") actx.resume();
+  return actx;
+}
+
+const BGM_MELODY = [
+  587.33, 0, 698.46, 659.25, 587.33, 0, 523.25, 587.33,
+  698.46, 0, 880.00, 783.99, 698.46, 659.25, 587.33, 0,
+  659.25, 0, 783.99, 698.46, 659.25, 587.33, 523.25, 440.00,
+  587.33, 659.25, 698.46, 523.25, 587.33, 0, 440.00, 0
+];
+const BGM_BASS = [
+  146.83, 220.00, 146.83, 220.00, 130.81, 196.00, 146.83, 220.00,
+  174.61, 261.63, 174.61, 261.63, 146.83, 220.00, 146.83, 220.00,
+  164.81, 246.94, 164.81, 246.94, 130.81, 196.00, 110.00, 164.81,
+  146.83, 164.81, 174.61, 130.81, 146.83, 110.00, 146.83, 0
+];
+
+function startBGMLoop() {
+  if (bgmTimer || !bgmEnabled) return;
+  const ctx = ensureAudio(); if (!ctx) return;
+  bgmStarted = true;
+  bgmTimer = setInterval(() => {
+    if (!bgmEnabled || !actx || actx.state !== "running" || isListeningAudioPlaying) return;
+    const now = actx.currentTime;
+    const mFreq = BGM_MELODY[bgmStep % BGM_MELODY.length];
+    const bFreq = BGM_BASS[bgmStep % BGM_BASS.length];
+    if (mFreq > 0) {
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.type = "square"; o.frequency.setValueAtTime(mFreq, now);
+      g.gain.setValueAtTime(0.016, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+      o.connect(g); g.connect(actx.destination); o.start(now); o.stop(now + 0.17);
+    }
+    if (bFreq > 0) {
+      const o2 = actx.createOscillator(), g2 = actx.createGain();
+      o2.type = "triangle"; o2.frequency.setValueAtTime(bFreq, now);
+      g2.gain.setValueAtTime(0.028, now); g2.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+      o2.connect(g2); g2.connect(actx.destination); o2.start(now); o2.stop(now + 0.19);
+    }
+    bgmStep++;
+  }, 195);
+}
+
+function stopBGMLoop() { if (bgmTimer) { clearInterval(bgmTimer); bgmTimer = null; } }
+
+function toggleBGM() {
+  bgmEnabled = !bgmEnabled;
+  const btn = document.getElementById("bgm-btn");
+  btn.textContent = bgmEnabled ? "🎵 Nhạc nền: BẬT" : "🔇 Nhạc nền: TẮT";
+  btn.classList.toggle("off", !bgmEnabled);
+  if (bgmEnabled) startBGMLoop(); else stopBGMLoop();
+}
+
+function toggleSFX() {
+  sfxEnabled = !sfxEnabled;
+  const btn = document.getElementById("sfx-btn");
+  btn.textContent = sfxEnabled ? "🔊 Hiệu ứng: BẬT" : "🔕 Hiệu ứng: TẮT";
+  btn.classList.toggle("off", !sfxEnabled);
+}
+
+document.addEventListener("pointerdown", () => {
+  if (bgmEnabled && !bgmStarted) startBGMLoop();
+}, { once: true });
+
+function tone(freq, endFreq, dur, type = "square", delay = 0, vol = 0.08) {
+  if (!sfxEnabled) return;
+  const ctx = ensureAudio(); if (!ctx) return;
+  const t = ctx.currentTime + delay;
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = type; o.frequency.setValueAtTime(freq, t);
+  if (endFreq && endFreq !== freq) o.frequency.exponentialRampToValueAtTime(Math.max(20, endFreq), t + dur);
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+  o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + dur + 0.01);
+}
+
+function noiseBurst(dur, filterFreq = 1000, filterType = "bandpass", delay = 0, vol = 0.1) {
+  if (!sfxEnabled) return;
+  const ctx = ensureAudio(); if (!ctx) return;
+  const bufSize = Math.floor(ctx.sampleRate * dur);
+  const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1;
+  const src = ctx.createBufferSource(); src.buffer = buf;
+  const filt = ctx.createBiquadFilter(); filt.type = filterType;
+  filt.frequency.setValueAtTime(filterFreq, ctx.currentTime + delay);
+  const g = ctx.createGain(), t = ctx.currentTime + delay;
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+  src.connect(filt); filt.connect(g); g.connect(ctx.destination);
+  src.start(t); src.stop(t + dur);
+}
+
+function sfxHeroSlash(isCrit = false) {
+  noiseBurst(0.09, 2600, "highpass", 0, 0.09);
+  tone(880, 220, 0.1, "sawtooth", 0, 0.07);
+  setTimeout(() => {
+    noiseBurst(0.12, 650, "lowpass", 0, 0.14);
+    tone(190, 65, 0.14, "square", 0, 0.11);
+    if (isCrit) {
+      tone(980, 1480, 0.12, "square", 0.04, 0.09);
+      tone(1320, 1760, 0.15, "triangle", 0.1, 0.08);
+    }
+  }, 150);
+}
+function sfxFireBreath() {
+  tone(150, 85, 0.22, "sawtooth", 0, 0.09);
+  noiseBurst(0.38, 900, "bandpass", 0.05, 0.12);
+  setTimeout(() => {
+    noiseBurst(0.24, 380, "lowpass", 0, 0.18);
+    tone(140, 42, 0.25, "sawtooth", 0, 0.12);
+  }, 340);
+}
+function sfxMonsterDie() {
+  noiseBurst(0.4, 500, "lowpass", 0.05, 0.18);
+  tone(320, 55, 0.45, "sawtooth", 0.05, 0.1);
+  [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => tone(f, f, 0.14, "square", 0.42 + i * 0.09, 0.08));
+}
+function sfxComboPowerUp() { [587.33, 739.99, 880, 1174.66].forEach((f, i) => tone(f, f, 0.11, "triangle", 0.25 + i * 0.06, 0.1)); }
+function sfxHintChime() { tone(1046.5, 1318.5, 0.12, "sine", 0, 0.09); tone(1568, 1568, 0.18, "sine", 0.08, 0.08); }
+function sfxTick() { tone(900, 900, 0.04, "sine", 0, 0.04); }
+function sfxDefeat() { [392, 370, 349.23, 293.66].forEach((f, i) => tone(f, f * 0.92, 0.22, "sawtooth", 0.4 + i * 0.2, 0.08)); }
+
+// ================= REAL LISTENING FILE HANDLER (NO SYNTHETIC QUESTIONS) =================
+let realAudioSrc = "listening.mp3"; // Auto-loads if placed next to HTML
+let realAudioName = "listening.mp3 (mặc định cùng thư mục)";
+let hasCustomAudio = false;
+let isListeningAudioPlaying = false;
+
+function handleAudioFileUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (hasCustomAudio && realAudioSrc.startsWith("blob:")) URL.revokeObjectURL(realAudioSrc);
+  realAudioSrc = URL.createObjectURL(file);
+  realAudioName = file.name;
+  hasCustomAudio = true;
+
+  const sMsg = document.getElementById("settings-audio-status");
+  if (sMsg) {
+    sMsg.textContent = `✔ Đã nạp file nghe gốc: ${file.name}`;
+    sMsg.style.color = "#6ee7b7";
+  }
+
+  // Update active audio player on screen if currently viewing a Listening question
+  const audioEl = document.getElementById("real-listening-player");
+  if (audioEl) {
+    audioEl.src = realAudioSrc;
+    audioEl.load();
+    const st = document.getElementById("listen-status");
+    if (st) {
+      st.textContent = `✔ Đã nạp: ${file.name}. Bấm nút Play (▶) để nghe nguyên file!`;
+      st.style.color = "#6ee7b7";
+    }
+  }
+}
+
+function stopRealAudioPlayer() {
+  isListeningAudioPlaying = false;
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+  const audioEl = document.getElementById("real-listening-player");
+  if (audioEl && !audioEl.paused) {
+    audioEl.pause();
+    audioEl.currentTime = 0;
+  }
+}
+
+function speakSampleOnly(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-GB";
+  u.rate = 0.95;
+  window.speechSynthesis.speak(u);
+}
+
+// ================= 100 QUESTIONS (FLOOR 4 = 100% REAL LISTENING FILE, DIFF QUESTIONS) =================
+const FLOORS = [
+  {
+    id: 1, title: "Tầng 1: Ngôi Làng Tính Cách", monster: "Vua Slime Lục",
+    topic: "Unit 1 – Tính cách & Đọc hiểu 'The Boy Who Built a Digital Classroom'",
+    mcq: [
+      { diff: "easy", q: "My aunt is so ______ that she always shares her homemade cakes with all the neighbors.", opts: ["nervous", "selfish", "generous", "bad-tempered"], ans: "generous", exp: "'generous' (hào phóng) phù hợp với việc hay chia sẻ đồ ăn với hàng xóm." },
+      { diff: "hard", q: "Although Leo is usually ______ before big speeches, he spoke calmly during the assembly.", opts: ["nervous", "selfish", "bad-tempered", "lazy"], ans: "nervous", exp: "Mệnh đề nhượng bộ 'Although' (Mặc dù): bình thường hay lo lắng ('nervous') nhưng lại nói bình tĩnh." },
+      { diff: "hard", q: "My sister is really keen ______ landscape drawing, so she sketches mountains every weekend.", opts: ["in", "on", "about", "at"], ans: "on", exp: "Cụm cố định: 'keen on + V-ing/Noun' (say mê làm gì)." },
+      { diff: "hard", context: "When twelve-year-old Mateo noticed that shy students in his village rarely asked questions in class, he created a free online study channel.", q: "Why did Mateo create the online study channel?", opts: ["He wanted to become a famous TV presenter.", "Shy classmates felt nervous asking questions aloud in class.", "His school had no textbooks or teachers.", "He wanted to play games consoles."], ans: "Shy classmates felt nervous asking questions aloud in class.", exp: "Theo bài đọc Practice Test 1: học sinh rụt rè ngại hỏi to trên lớp nên Mateo tạo kênh học trực tuyến." },
+      { diff: "hard", context: "On this platform, students who feel nervous speaking aloud can type questions anonymously without showing who they are.", q: "In the passage, the word 'anonymously' most likely means:", opts: ["without showing their real names", "in a very loud and angry voice", "while running around the playground", "only during weekend exams"], ans: "without showing their real names", exp: "'anonymously' nghĩa là ẩn danh (không lộ tên thật)." },
+      { diff: "hard", context: "Mateo believes that true achievement is not about winning trophies alone, but helping everyone chase their dreams.", q: "What is the writer's opinion of Mateo?", opts: ["The writer thinks Mateo is selfish and lazy.", "The writer admires Mateo's kindness and community spirit.", "The writer believes Mateo spends too much time on games consoles.", "The writer feels Mateo should stop coding."], ans: "The writer admires Mateo's kindness and community spirit.", exp: "Tác giả ca ngợi sự hào phóng và tinh thần giúp đỡ cộng đồng của Mateo." }
+    ],
+    boss: [
+      { diff: "easy", q: "The opposite of 'hardworking' is ______.", ans: ["lazy"], exp: "'lazy' (lười biếng) trái nghĩa với 'hardworking'." },
+      { diff: "hard", q: "Christine Ha stayed calm and became an inspirational role ______ worldwide.", ans: ["model"], exp: "Cụm danh từ trong bài: 'role model' (tấm gương truyền cảm hứng)." },
+      { diff: "hard", q: "Winning the national prize was an extraordinary ______ for the twelve-year-old boy.", ans: ["achievement"], exp: "'achievement' (thành tựu) đi với tính từ 'extraordinary'." },
+      { diff: "hard", q: "True success is not only about trophies, but helping everyone ______ their dreams.", ans: ["chase"], exp: "Cụm từ: 'chase one's dreams' (theo đuổi ước mơ)." }
+    ]
+  },
+  {
+    id: 2, title: "Tầng 2: Tháp Ngữ Pháp & Viết Câu", monster: "Yêu Tinh Goblin",
+    topic: "Unit 1 – Tính từ + Giới từ, Đọc hiểu Christine Ha & Kỹ năng viết",
+    mcq: [
+      { diff: "easy", q: "Ben's teacher says he is very good ______ singing in front of the school.", opts: ["in", "at", "about", "with"], ans: "at", exp: "Cấu trúc: 'good at + V-ing/Noun' (giỏi về việc gì)." },
+      { diff: "hard", q: "Were you shocked ______ the news that the arctic glacier is melting so fast?", opts: ["at", "by", "with", "in"], ans: "by", exp: "Theo đề cương Unit 1: 'shocked by' (bị sốc bởi)." },
+      { diff: "hard", q: "Nobody ______ why the ancient stone tower stands at the edge of the quiet forest.", opts: ["know", "knows", "knowing", "are knowing"], ans: "knows", exp: "Đại từ bất định 'Nobody' luôn chia động từ số ít -> 'knows'." },
+      { diff: "hard", context: "Even though Christine Ha could no longer see ingredients, she relied on her sharp senses of smell, taste, and touch to work out every recipe.", q: "How did Christine judge her ingredients while cooking?", opts: ["By asking other contestants to taste her food.", "By using her senses of smell, taste, and touch.", "By reading giant printed recipe books.", "By watching cooking videos online."], ans: "By using her senses of smell, taste, and touch.", exp: "Theo bài đọc Practice Test 2: cô dùng khứu giác, vị giác và xúc giác." },
+      { diff: "hard", q: "Which sentence has the CORRECT punctuation and capitalization?", opts: ["Although my cousin lives in Sydney Australia he celebrates Lunar New Year.", "Although my cousin lives in Sydney, Australia, he celebrates Lunar New Year.", "although my cousin lives in Sydney, Australia, he celebrates lunar new year.", "Although my cousin lives in sydney, Australia he celebrates Lunar New Year."], ans: "Although my cousin lives in Sydney, Australia, he celebrates Lunar New Year.", exp: "Tên riêng 'Sydney, Australia', 'Lunar New Year' viết hoa và có dấu phẩy tách mệnh đề 'Although...'." },
+      { diff: "hard", q: "Choose the correctly ordered sentence:", opts: ["Anna was very pleased about her inspiring achievement.", "Anna pleased was very about her achievement inspiring.", "Was Anna very pleased inspiring about her achievement.", "About her inspiring achievement pleased very was Anna."], ans: "Anna was very pleased about her inspiring achievement.", exp: "Cấu trúc: S + was + very pleased about + adj + noun." }
+    ],
+    boss: [
+      { diff: "hard", q: "My classmates were very curious ______ the 3D optical illusion on the street.", ans: ["about"], exp: "Cấu trúc: 'curious about' (tò mò về)." },
+      { diff: "hard", q: "Anna's parents were very pleased ______ her inspiring science achievement.", ans: ["with"], exp: "Cấu trúc: 'pleased with' (hài lòng với)." },
+      { diff: "hard", q: "Determination and skill can overcome any major ______ or difficulty. (từ vựng bài Christine Ha, bắt đầu bằng 'o...')", ans: ["obstacle"], exp: "'obstacle' nghĩa là chướng ngại vật, rào cản." },
+      { diff: "easy", q: "They ______ watch TV in the morning because they go to school early. (phủ định Hiện tại đơn)", ans: ["don't"], exp: "Chủ ngữ 'They' dùng 'don't'." }
+    ]
+  },
+  {
+    id: 3, title: "Tầng 3: Phòng Khám & Biển Báo Sức Khỏe", monster: "Dơi Độc Bệnh Viện",
+    topic: "Unit 2 – Bệnh tật, Đọc hiểu Biển báo & Bài đọc Dinh dưỡng",
+    mcq: [
+      { diff: "easy", q: "If you want stronger bones and teeth, you should eat dairy products rich in ______.", opts: ["fibre", "calcium", "nectar", "virus"], ans: "calcium", exp: "'calcium' (canxi) giúp xương và răng chắc khỏe." },
+      { diff: "hard", context: "[SCHOOL NURSE CLINIC] Students feeling dizzy or shivering must report here before 10:00 a.m.", q: "What should an ill student do according to the sign?", opts: ["Go straight home without telling anyone.", "Visit the clinic early in the morning.", "Wait until afternoon lessons finish.", "Take medicine inside the classroom."], ans: "Visit the clinic early in the morning.", exp: "'before 10:00 a.m.' tương ứng với đến phòng y tế vào buổi sáng sớm." },
+      { diff: "hard", context: "[BAKERY ALLERGY NOTICE] Our almond croissants contain nuts and dairy products. Ask staff for nut-free options.", q: "Who needs to read this notice carefully?", opts: ["Customers with food allergies.", "People who hate sweet desserts.", "Bakers applying for a weekend job.", "Tourists looking for a post office."], ans: "Customers with food allergies.", exp: "Thông báo cảnh báo thành phần gây dị ứng ('nuts and dairy products') cho khách có dị ứng thức ăn." },
+      { diff: "hard", context: "[JUNGLE CAMP RULE] Mosquito nets are provided in every tent, so campers needn't bring their own.", q: "What does this rule mean?", opts: ["Campers are forbidden to use nets.", "Campers must buy nets at the gate.", "It is unnecessary to pack a mosquito net.", "Mosquitoes never bite inside tents."], ans: "It is unnecessary to pack a mosquito net.", exp: "'needn't' = không cần thiết ('unnecessary')." },
+      { diff: "hard", q: "Doctors warn that teenagers who skip breakfast and eat sugary snacks often suffer from low energy and catch ______ more easily.", opts: ["viruses", "muscles", "calcium", "habits"], ans: "viruses", exp: "'catch viruses' nghĩa là dễ bị nhiễm vi-rút gây bệnh hơn." },
+      { diff: "hard", context: "When you exercise regularly, tiny fibres in your muscles need protein—found in eggs, beans, fish, and dairy products—to repair and grow stronger.", q: "Which foods help repair muscle fibres after exercise?", opts: ["Sugary sweets and fizzy drinks.", "Eggs, beans, fish, and dairy products.", "Only white bread and potato chips.", "Soda and chocolate bars."], ans: "Eggs, beans, fish, and dairy products.", exp: "Các thực phẩm giàu protein này giúp phục hồi các sợi cơ." }
+    ],
+    boss: [
+      { diff: "easy", q: "I shouted too loudly at the stadium, so now I have a lost ______.", ans: ["voice"], exp: "Cụm từ Unit 2: 'lost voice' (mất giọng)." },
+      { diff: "hard", q: "Students feeling ______ (chóng mặt) or shivering must visit the school nurse before 10:00 a.m.", ans: ["dizzy"], exp: "'dizzy' nghĩa là chóng mặt." },
+      { diff: "hard", q: "After eating peanuts, she got a red skin rash because of an ______ reaction.", ans: ["allergic"], exp: "Cụm từ: 'allergic reaction' (phản ứng dị ứng)." },
+      { diff: "hard", q: "When you have a bad cold, your nose feels ______ and it's hard to breathe.", ans: ["blocked"], exp: "Cụm từ Unit 2: 'blocked nose' (ngạt mũi)." }
+    ]
+  },
+  {
+    id: 4, title: "Tầng 4: ĐẤU TRƯỜNG LISTENING (File Nghe Gốc)", monster: "Muỗi Chúa Sốt Rét",
+    topic: "🎧 Phát nguyên File Audio Listening của bạn — Trả lời 10 câu hỏi khác nhau về bài nghe!",
+    mcq: [
+      { diff: "easy", listenReal: true, q: "🎧 Nghe file audio: Which group of students is invited to the workshop?", opts: ["Stage 3", "Stage 4", "Stage 5", "Stage 6"], ans: "Stage 5", exp: "Ngay đầu bài nghe thông báo: 'Attention Stage 5!'." },
+      { diff: "hard", listenReal: true, q: "🎧 Nghe file audio: What is the workshop mainly about?", opts: ["Cooking healthy breakfast plates", "Healthy living and mosquito safety", "Drawing 3D optical illusions", "Calculating international time zones"], ans: "Healthy living and mosquito safety", exp: "Bài nghe mời tham gia: 'our healthy living and mosquito safety workshop'." },
+      { diff: "hard", listenReal: true, q: "🎧 Nghe file audio: On which day and date will the workshop take place?", opts: ["Wednesday, 4th October", "Wednesday, 14th October", "Thursday, 14th October", "Wednesday, 24th October"], ans: "Wednesday, 14th October", exp: "Thông báo nói rõ: 'on Wednesday, 14th October'." },
+      { diff: "hard", listenReal: true, q: "🎧 Nghe file audio: What time does the workshop start?", opts: ["3:15 p.m.", "3:30 p.m.", "4:30 p.m.", "3:30 a.m."], ans: "3:30 p.m.", exp: "Giờ bắt đầu trong bài nghe là 'at 3:30 p.m.'." },
+      { diff: "hard", listenReal: true, q: "🎧 Nghe file audio: Where will the workshop be held?", opts: ["In the science lab", "In the school hall", "In the library", "At the main gate"], ans: "In the school hall", exp: "Địa điểm tổ chức được nhắc tới là 'in the school hall'." },
+      { diff: "hard", listenReal: true, q: "🎧 Nghe file audio: What serious disease will the doctor explain how to prevent?", opts: ["Allergic reaction", "Malaria", "Stomach ache", "Ear infection"], ans: "Malaria", exp: "Bác sĩ sẽ giải thích cách phòng tránh bệnh sốt rét ('how to prevent malaria')." }
+    ],
+    boss: [
+      { diff: "hard", listenReal: true, q: "🎧 Boss Listen: The guest speaker's name is Dr. ______.", ans: ["harry"], exp: "File nghe đánh vần tên bác sĩ: 'H-A-R-R-Y' -> Harry." },
+      { diff: "hard", listenReal: true, q: "🎧 Boss Listen: Dr. Harry will explain how mosquitoes lay eggs in ______.", ans: ["puddles"], exp: "File nghe nói rõ: 'how mosquitoes lay eggs in puddles' (các vũng nước đọng)." },
+      { diff: "hard", listenReal: true, q: "🎧 Boss Listen: Every student attending will receive a free bottle of natural ______.", ans: ["repellent"], exp: "Phần quà miễn phí cuối bài nghe là: 'a free bottle of natural repellent'." },
+      { diff: "easy", listenReal: true, q: "🎧 Boss Listen: The workshop takes place in the month of ______.", ans: ["october"], exp: "Tháng tổ chức hội thảo là 'October' (tháng Mười)." }
+    ]
+  },
+  {
+    id: 5, title: "Tầng 5: Doanh Trại Lượng Từ & Dinh Dưỡng", monster: "Orc Giáp Sắt",
+    topic: "Unit 2 – Quantifiers, Modals & Đọc hiểu 'Hidden Sugar Trap'",
+    mcq: [
+      { diff: "easy", q: "There is ______ sugar in plain oats than in chocolate breakfast cereal.", opts: ["fewer", "less", "not as many", "more few"], ans: "less", exp: "'sugar' không đếm được -> dùng 'less'." },
+      { diff: "hard", q: "You shouldn't eat as ______ fried snacks if you want to avoid a tummy ache.", opts: ["much", "less", "many", "fewer"], ans: "many", exp: "'fried snacks' đếm được số nhiều -> dùng 'as many'." },
+      { diff: "hard", q: "Campers ______ leave food uncovered outside their tents because it attracts wild insects.", opts: ["needn't", "mustn't", "could", "would"], ans: "mustn't", exp: "'mustn't' (cấm, không được phép) vì để đồ ăn hở sẽ thu hút côn trùng." },
+      { diff: "hard", context: "Drinking too many sugary beverages leads to energy crashes, tooth decay, and weight gain. Whole grains provide steady energy during afternoon practice.", q: "The phrase 'energy crashes' in the passage means:", opts: ["exciting sports victories", "accidents on a bicycle", "sudden drops in physical energy", "eating too much protein"], ans: "sudden drops in physical energy", exp: "'energy crashes' là sự sụt giảm năng lượng đột ngột." },
+      { diff: "hard", context: "Whole grains and fresh fruit provide steady energy so you do not feel dizzy during afternoon practice.", q: "The word 'steady' is closest in meaning to:", opts: ["sudden and dangerous", "regular and continuous", "weak and disappearing", "sweet and chewy"], ans: "regular and continuous", exp: "'steady' nghĩa là đều đặn, ổn định và liên tục." },
+      { diff: "hard", context: "You needn't follow a strict adult diet, but balancing your meals and sleeping eight hours every night will keep your immune system ready.", q: "What does the writer think about young athletes following strict adult diets?", opts: ["It is strictly mandatory for every child.", "It is unnecessary if they eat balanced meals and sleep well.", "It is the only way to prevent ear infections.", "Teenagers must skip breakfast every day."], ans: "It is unnecessary if they eat balanced meals and sleep well.", exp: "'needn't' = không cần thiết ('unnecessary') nếu ăn cân bằng và ngủ đủ." }
+    ],
+    boss: [
+      { diff: "hard", q: "Teenagers should drink ______ sugary drinks and more plain water. (danh từ đếm được số nhiều)", ans: ["fewer"], exp: "'sugary drinks' là danh từ đếm được số nhiều -> dùng 'fewer'." },
+      { diff: "hard", q: "Is there ______ in this classroom who knows how to calculate international time zones?", ans: ["anyone", "anybody"], exp: "Trong câu hỏi dùng 'anyone' hoặc 'anybody'." },
+      { diff: "hard", q: "You ______ follow a strict adult diet; just balance your meals and sleep well. (không cần thiết)", ans: ["needn't"], exp: "'needn't' nghĩa là không cần phải làm gì." },
+      { diff: "easy", q: "Although mosquitoes have a short ______, they can spread serious illnesses like malaria. (tuổi thọ)", ans: ["lifespan"], exp: "'lifespan' nghĩa là tuổi thọ (trong Cloze Test Practice Test 2)." }
+    ]
+  },
+  {
+    id: 6, title: "Tầng 6: Thành Cổ & Ảo Ảnh Đường Phố", monster: "Người Đá Golem",
+    topic: "Unit 3 – Đọc biển báo, Cloze Test Micro-Apartment & Street Art",
+    mcq: [
+      { diff: "hard", context: "[CITY ART GALLERY] Please do not step inside the painted yellow square on the floor!", q: "Why is this notice displayed?", opts: ["The floor is wet and slippery.", "Stepping there spoils the 3D optical illusion.", "Only teachers can stand in the square.", "The gallery is closed for repairs."], ans: "Stepping there spoils the 3D optical illusion.", exp: "Bước vào ô vuông sẽ làm hỏng tác phẩm ảo ảnh 3D." },
+      { diff: "hard", q: "In crowded modern cities like Tokyo, land is scarce, ______ architects design clever micro-apartments.", opts: ["so", "but", "because", "although"], ans: "so", exp: "Đất khan hiếm -> vì vậy ('so') kiến trúc sư thiết kế căn hộ siêu nhỏ." },
+      { diff: "hard", q: "Beds fold neatly into walls during the day, ______ creates space for a study desk.", opts: ["who", "where", "which", "what"], ans: "which", exp: "Dùng đại từ quan hệ 'which' thay thế cho cả mệnh đề phía trước." },
+      { diff: "hard", q: "Although micro-apartments are not as spacious ______ traditional houses, they are closer to metro stations.", opts: ["than", "as", "like", "more"], ans: "as", exp: "Cấu trúc so sánh ngang bằng phủ định: 'not as + adj + as'." },
+      { diff: "hard", context: "Unlike permanent statues in museums, chalk street art vanishes when rain falls—making every sunny afternoon exhibition a rare, magical experience.", q: "What does the word 'vanishes' in the sentence mean?", opts: ["disappears completely", "becomes heavier", "turns into stone", "shines brighter"], ans: "disappears completely", exp: "'vanishes' nghĩa là biến mất hoàn toàn." },
+      { diff: "easy", context: "Artists carefully calculate angles, stretch vertical lines, and add dark shading along curved edges.", q: "How do street artists make a flat drawing look three-dimensional?", opts: ["By digging deep holes into the city pavement.", "By stretching vertical lines and adding dark shading.", "By placing bright neon lights under the street.", "By painting only at midnight."], ans: "By stretching vertical lines and adding dark shading.", exp: "Bài đọc nêu rõ: kéo dài các đường thẳng đứng và thêm bóng tối dọc cạnh cong." }
+    ],
+    boss: [
+      { diff: "hard", q: "Visitors ______ touch the 3D chalk art because wet shoes will ruin the drawing. (cấm đoán)", ans: ["mustn't"], exp: "'mustn't' diễn tả sự cấm đoán." },
+      { diff: "hard", q: "A typical micro-apartment feels much ______ (sáng sủa hơn) than an ordinary small room.", ans: ["brighter"], exp: "So sánh hơn của tính từ ngắn 'bright' là 'brighter'." },
+      { diff: "hard", q: "To draw an optical ______, artists stretch vertical lines and shade curved edges.", ans: ["illusion"], exp: "Cụm từ: 'optical illusion' (ảo ảnh thị giác)." },
+      { diff: "easy", q: "If you make a mistake in your pencil sketch, you can ______ it out with an eraser.", ans: ["rub"], exp: "Cụm động từ Unit 3: 'rub out' (tẩy xóa)." }
+    ]
+  },
+  {
+    id: 7, title: "Tầng 7: Đấu Trường So Sánh & Phương Hướng", monster: "Hiệp Sĩ Bóng Ma",
+    topic: "Unit 3 – So sánh nâng cao & Đọc hiểu 'From Wooden Carts to Bullet Trains'",
+    mcq: [
+      { diff: "easy", q: "Bullet trains travel ______ than ordinary buses, connecting distant cities in two hours.", opts: ["farther", "faster", "more clearly", "fastest"], ans: "faster", exp: "So sánh hơn của trạng từ 'fast' là 'faster'." },
+      { diff: "hard", q: "The new science museum is across ______ the central library, next to the zebra crossing.", opts: ["from", "to", "opposite", "near"], ans: "from", exp: "Có từ 'across' đi kèm phải là 'across from' (đối diện)." },
+      { diff: "hard", q: "Among all the runners in the race, Minh ran the ______ and broke the school record.", opts: ["fastest", "faster", "most fast", "more fast"], ans: "fastest", exp: "So sánh nhất của trạng từ 'fast' là 'the fastest'." },
+      { diff: "hard", context: "Today, Japan's Shinkansen bullet trains run on electricity and glide smoothly along steel tracks at speeds exceeding 300 km/h.", q: "Why are bullet trains better for the environment than cars?", opts: ["They travel along narrow dirt paths.", "They are pulled by horses in rural areas.", "They run on electricity and create much less air pollution.", "They never stop at any station."], ans: "They run on electricity and create much less air pollution.", exp: "Theo bài đọc Practice Test 2: chạy bằng điện nên ít gây ô nhiễm không khí hơn ô tô." },
+      { diff: "hard", context: "Japan's Shinkansen bullet trains glide smoothly along steel tracks at high speeds.", q: "In the text, the word 'glide' most likely means:", opts: ["move smoothly and effortlessly", "crash loudly into stations", "stop every five minutes", "fly high in the clouds"], ans: "move smoothly and effortlessly", exp: "'glide' nghĩa là lướt đi êm ái, nhẹ nhàng." },
+      { diff: "hard", context: "While ancient carriages had a charming, peaceful rhythm, modern high-speed rail networks have transformed how millions of commuters work and explore the world.", q: "How does the writer compare old and modern transport?", opts: ["The writer thinks cities should destroy all modern railways.", "The writer appreciates the charm of the past while praising modern efficiency.", "The writer believes old carriages were faster than bullet trains.", "The writer dislikes both carriages and trains."], ans: "The writer appreciates the charm of the past while praising modern efficiency.", exp: "Tác giả vừa trân trọng nét thanh bình xưa vừa khen ngợi hiệu quả hiện đại." }
+    ],
+    boss: [
+      { diff: "hard", q: "I can see the face ______ clearly than the vase in this optical illusion.", ans: ["more"], exp: "So sánh hơn của trạng từ dài 'clearly' là 'more clearly'." },
+      { diff: "hard", q: "The bus stop is right ______ the corner of Maple Street and Green Avenue.", ans: ["at"], exp: "Cụm cố định: 'at the corner of ...'." },
+      { diff: "hard", q: "Our village is ______ quieter and cleaner than the noisy city centre. (nhấn mạnh so sánh hơn, gợi ý: m...)", ans: ["much"], exp: "Từ nhấn mạnh trước so sánh hơn ('much quieter', 'much more peaceful')." },
+      { diff: "easy", q: "Her speaking score is ______ than mine because she practices every day. (so sánh hơn của 'good')", ans: ["better"], exp: "Bất quy tắc: 'good' -> 'better'." }
+    ]
+  },
+  {
+    id: 8, title: "Tầng 8: Cỗ Máy Thời Gian & Câu Hỏi Đuôi", monster: "Quỷ Đá Gargoyle",
+    topic: "Unit 3 – Quá khứ đơn, Tag Questions & Chấm dấu câu / Sắp xếp câu",
+    mcq: [
+      { diff: "hard", q: "In the 19th century, people ______ micro-apartments because cities were much smaller.", opts: ["didn't build", "don't build", "aren't building", "weren't build"], ans: "didn't build", exp: "Mốc thời gian quá khứ ('In the 19th century') -> Quá khứ đơn phủ định: 'didn't build'." },
+      { diff: "hard", q: "In the past, people ______ smartphones to check the time; they looked at clock towers.", opts: ["didn't use", "don't use", "aren't using", "didn't used"], ans: "didn't use", exp: "Quá khứ đơn phủ định: 'didn't + V nguyên thể' ('didn't use')." },
+      { diff: "hard", q: "The optical illusion spins around very quickly, ______?", opts: ["isn't it", "doesn't it", "won't it", "did it"], ans: "doesn't it", exp: "Động từ thường hiện tại đơn khẳng định ('spins') -> câu hỏi đuôi dùng 'doesn't it?'." },
+      { diff: "hard", q: "Your grandparents travelled by horse and cart in the past, ______?", opts: ["didn't they", "did they", "weren't they", "don't they"], ans: "didn't they", exp: "Vế trước khẳng định quá khứ đơn ('travelled') -> đuôi 'didn't they?'." },
+      { diff: "hard", q: "Choose the sentence with PERFECT punctuation (direct speech):", opts: ["\"Could you pass me the insect repellent please?\" asked Tom.", "\"Could you pass me the insect repellent, please?\" asked Tom.", "\"could you pass me the insect repellent, please\" asked Tom.", "Could you pass me the insect repellent, please? asked Tom."], ans: "\"Could you pass me the insect repellent, please?\" asked Tom.", exp: "Lời nói trực tiếp nằm trong ngoặc kép, có dấu phẩy trước 'please', dấu hỏi nằm trong ngoặc kép." },
+      { diff: "easy", q: "Choose the correct punctuation for this tag question:", opts: ["The city centre is noisier than the countryside, isn't it?", "The city centre is noisier than the countryside isnt it?", "The city centre is noisier than the countryside, isn't it.", "the city centre is noisier than the countryside, isn't it?"], ans: "The city centre is noisier than the countryside, isn't it?", exp: "Câu hỏi đuôi cần dấu phẩy trước 'isn't it', dấu nháy đơn trong 'isn't', và dấu hỏi cuối câu." }
+    ],
+    boss: [
+      { diff: "hard", q: "Hamburgers and hot dogs are not healthy, ______ they? (câu hỏi đuôi)", ans: ["are"], exp: "Vế trước phủ định ('are not') -> đuôi khẳng định 'are they?'." },
+      { diff: "hard", q: "You don't see the hidden rabbit in the picture, ______ you?", ans: ["do"], exp: "Vế trước phủ định ('don't see') -> đuôi khẳng định 'do you?'." },
+      { diff: "hard", q: "James saw some ducks by the lake yesterday, ______ he?", ans: ["didn't"], exp: "Vế trước khẳng định quá khứ đơn ('saw') -> đuôi 'didn't he?'." },
+      { diff: "hard", q: "Suddenly, a man came and called the dog. ______ was his dog!", ans: ["it"], exp: "Trong bài mẫu Writing Task 4: 'It was his dog!'." }
+    ]
+  },
+  {
+    id: 9, title: "Tầng 9: Lễ Hội & Múi Giờ Quốc Tế", monster: "Quỷ Đèn Lồng Oni",
+    topic: "Unit 4 – Tin nhắn Múi giờ & Đọc hiểu Chuseok / 24 Time Zones",
+    mcq: [
+      { diff: "hard", context: "[TEXT MESSAGE – From: Linh] Hi Nam! My train arrives at 6 p.m., which is 4 hours behind Tokyo time. Meet you at the lantern parade!", q: "What does Linh tell Nam in her message?", opts: ["She will miss the lantern parade.", "They will celebrate in Tokyo together.", "She knows her arrival time and meeting spot.", "Her train was cancelled due to weather."], ans: "She knows her arrival time and meeting spot.", exp: "Linh báo rõ giờ tàu đến (6 p.m.) và điểm hẹn (lantern parade)." },
+      { diff: "hard", context: "When it was noon in London, it was already 12:16 p.m. in Paris! This caused chaos once fast trains and telegraphs connected distant cities.", q: "Why did local sun time become a problem in the 1800s?", opts: ["The sun stopped shining in northern Europe.", "Fast trains and telegraphs required coordinated schedules across cities.", "People forgot how to add and subtract numbers.", "Clock towers stopped working."], ans: "Fast trains and telegraphs required coordinated schedules across cities.", exp: "Tàu hỏa nhanh và điện tín đòi hỏi lịch trình thống nhất giữa các thành phố." },
+      { diff: "hard", context: "In 1884, before standard time zones existed, noon in London was already 12:16 p.m. in Paris! This caused chaos.", q: "In paragraph 1, the word 'chaos' is closest in meaning to:", opts: ["accurate calculation", "peaceful celebration", "complete confusion and disorder", "modern railway track"], ans: "complete confusion and disorder", exp: "'chaos' nghĩa là sự hỗn loạn, rối ren hoàn toàn." },
+      { diff: "hard", context: "For Koreans, Chuseok is far more than a holiday; it is a cherished bridge connecting past and future generations.", q: "The word 'cherished' is closest in meaning to:", opts: ["deeply valued and loved", "easily forgotten", "extremely expensive", "strictly forbidden"], ans: "deeply valued and loved", exp: "'cherished' nghĩa là được trân trọng, yêu quý sâu sắc." },
+      { diff: "hard", context: "Relatives dress in colourful traditional silk outfits called hanbok and gather around a feast of freshly harvested rice, fruit, and songpyeon—soft, chewy half-moon rice cakes filled with sweet sesame seeds or chestnuts.", q: "What are songpyeon filled with?", opts: ["Spicy fish and boiled potatoes", "Sweet sesame seeds or chestnuts", "Melted cheese and fresh tomatoes", "Chocolate and ice cream"], ans: "Sweet sesame seeds or chestnuts", exp: "Bài đọc ghi: 'filled with sweet sesame seeds or chestnuts'." },
+      { diff: "easy", q: "A tiara is a sparkling crown ______ princesses and brides wear on special occasions.", opts: ["who", "where", "which", "when"], ans: "which", exp: "'crown' là danh từ chỉ vật -> dùng đại từ quan hệ 'which'." }
+    ],
+    boss: [
+      { diff: "hard", q: "To calculate the time in New York from London, you simply ______ five hours.", ans: ["subtract"], exp: "Từ vựng Time zone & bài đọc Test 2: 'subtract' (trừ đi)." },
+      { diff: "hard", q: "Scientists ______ the globe into 24 standard time zones, each covering 15 degrees. (quá khứ đơn của 'divide')", ans: ["divided"], exp: "Quá khứ đơn: 'divided' (chia ra)." },
+      { diff: "hard", q: "During Chuseok, families dress in traditional outfits and gather around a special ______.", ans: ["feast"], exp: "'a feast' là bữa tiệc lớn thịnh soạn." },
+      { diff: "easy", q: "At midnight on New Year's Eve, bright ______ light up the dark night sky.", ans: ["fireworks"], exp: "'fireworks' nghĩa là pháo hoa." }
+    ]
+  },
+  {
+    id: 10, title: "Tầng 10 (ĐỈNH THÁP): Lãnh Địa Rồng Lửa", monster: "Rồng Lửa Cổ Đại",
+    topic: "Tổng Ôn Cực Khó: Relative Clauses, Future Continuous, Metro Sign & Writing",
+    mcq: [
+      { diff: "hard", q: "Look at those dark clouds! We ______ our outdoor reception inside the hall tonight.", opts: ["move", "are moving", "moved", "were moving"], ans: "are moving", exp: "Kế hoạch đã quyết định cho tương lai gần ('tonight') -> dùng Hiện tại tiếp diễn: 'are moving'." },
+      { diff: "hard", q: "Next month, a famous Japanese designer ______ a new eco-friendly tower powered by solar panels!", opts: ["opens", "is opening", "opened", "open"], ans: "is opening", exp: "Sự kiện đã lên lịch trong tương lai ('Next month') -> dùng 'is opening'." },
+      { diff: "hard", q: "A reception hall is a special place ______ wedding guests gather to enjoy a feast.", opts: ["which", "who", "where", "that"], ans: "where", exp: "Chỉ nơi chốn nơi hành động diễn ra ('guests gather') -> dùng 'where'." },
+      { diff: "hard", q: "Choose the sentence with CORRECT punctuation and capitalization:", opts: ["On Thursday morning, Dr. Smith will explain how vitamins, calcium, and protein help our muscles.", "On thursday morning Dr Smith will explain how vitamins calcium and protein help our muscles.", "On Thursday morning Dr. Smith will explain how vitamins, calcium and protein help our muscles", "on Thursday morning, Dr. Smith will explain how vitamins, calcium, and protein help our muscles."], ans: "On Thursday morning, Dr. Smith will explain how vitamins, calcium, and protein help our muscles.", exp: "Viết hoa 'Thursday', 'Dr. Smith', dùng dấu phẩy sau cụm trạng ngữ thời gian và liệt kê danh từ." },
+      { diff: "hard", context: "[CITY METRO TICKET] Valid for unlimited journeys on all underground lines for 24 hours from first scan.", q: "How does this metro ticket work?", opts: ["It can only be used once.", "It expires immediately at midnight.", "It is valid on international bullet trains.", "It allows multiple metro trips within one day."], ans: "It allows multiple metro trips within one day.", exp: "'unlimited journeys ... for 24 hours' = đi không giới hạn chuyến trong 1 ngày." },
+      { diff: "easy", q: "Next week, our science club ______ posters to teach younger pupils how to prevent mosquito bites.", opts: ["creates", "created", "is creating", "create"], ans: "is creating", exp: "Kế hoạch tương lai ('Next week') -> Hiện tại tiếp diễn: 'is creating'." }
+    ],
+    boss: [
+      { diff: "hard", q: "This is the town square ______ people gather to release colourful lanterns. (đại từ quan hệ)", ans: ["where"], exp: "'town square' là địa điểm nơi mọi người tụ tập -> dùng 'where'." },
+      { diff: "hard", q: "Look at the calendar! Our relatives from Australia are ______ at the airport tomorrow evening. (V-ing của 'arrive')", ans: ["arriving"], exp: "Hiện tại tiếp diễn mang nghĩa tương lai: 'are arriving'." },
+      { diff: "hard", q: "______ Leo is usually nervous before big speeches, he spoke calmly during the assembly. (từ nối nghĩa 'Mặc dù')", ans: ["although"], exp: "'Although' nghĩa là Mặc dù (chỉ sự đối lập)." },
+      { diff: "hard", q: "The time zone system is a helpful system ______ coordinates global travel and communication. (đại từ quan hệ chỉ vật)", ans: ["which", "that"], exp: "'a helpful system' là danh từ chỉ vật -> dùng 'which' hoặc 'that'." }
+    ]
+  }
+];
+
+// ================= WRITING TASKS 1-6 + BONUS TEST 2 =================
+const WRITING_TASKS = [
+  {
+    id: "t1", tab: "Task 1: Fictional Place",
+    title: "TASK 1: Describe your favorite fictional place.",
+    note: "Thì Hiện tại đơn (Present simple) • Ít nhất 60 từ • Connectives (and, but, because, also, so)",
+    guided: ["What is the place?", "Where is it?", "What does it look like?", "What can you do there?", "Who goes to this place?", "Why do you like it?"],
+    tenseHint: "Dùng Present simple (It is, It has, There are, People go...)",
+    starter: "My favorite fictional place is ", requiredStart: "",
+    sample: "My favorite fictional place is Candy Town. It is a magical town made of sweets. The houses are made of chocolate and the streets are made of cookies. There are lollipop trees and ice cream mountains everywhere. People can eat a little piece of anything they see. Children play on cotton candy clouds. I love this place because it looks fun, colorful and happy. I wish I could visit it one day."
+  },
+  {
+    id: "t2", tab: "Task 2: Celebration",
+    title: "TASK 2: Describe a celebration or festival.",
+    note: "Thì Hiện tại đơn (Present simple) • Ít nhất 60 từ • Connectives (and, but, because, also, so)",
+    guided: ["What is the celebration/festival?", "When is it celebrated?", "Where does it happen?", "Who celebrates it?", "What activities do people do during this celebration?", "Why is it special or important to you?"],
+    tenseHint: "Dùng Present simple (People celebrate, It happens, They wear, We visit...)",
+    starter: "My favorite celebration is ", requiredStart: "",
+    sample: "My favorite celebration is Tet, the Lunar New Year in Vietnam. It is celebrated in January or February. Families clean their houses, decorate them with peach blossoms and cook special food. People visit relatives, give lucky money and wish each other good luck. Children wear new clothes and play with their cousins. I love Tet because my family spends a lot of time together and everyone feels excited and hopeful for a new year."
+  },
+  {
+    id: "t3", tab: "Task 3: Health Problem",
+    title: "TASK 3: Describe a time when you were sick or had a health problem.",
+    note: "Thì Quá khứ đơn (Past simple) • Ít nhất 60 từ • Connectives (and, but, because, so)",
+    guided: ["When were you sick?", "What did you have (a cold, fever, stomach ache...)?", "How did you feel?", "What did you do to feel better?", "Who helped you?", "How did you feel after that?"],
+    tenseHint: "Dùng Past simple (I was, I had, I felt, I stayed, gave, helped, drank, slept...)",
+    starter: "Last month, I had ", requiredStart: "",
+    sample: "Last month, I had a fever. I felt very tired and had a headache. I could not go to school, so I stayed in bed. My mom gave me warm soup and some medicine. She helped me feel better. I drank warm water and slept a lot. After two days, I felt much better. I was happy to go back to school and see my friends again."
+  },
+  {
+    id: "t4", tab: "Task 4: Ollie Story",
+    title: "TASK 4: Write a story beginning with: 'Ollie ran to the park to meet his friends.'",
+    note: "Bắt buộc mở đầu đúng câu cho sẵn • Thì Quá khứ đơn • Ít nhất 60 từ • Mở - Thân - Kết rõ ràng",
+    guided: ["Why did Ollie run to the park?", "Who were his friends?", "What did they do at the park?", "Did something surprising or funny happen?", "How did the story end?"],
+    tenseHint: "Dùng Past simple (ran, saw, played, looked, gave, came, called, felt, went...)",
+    starter: "Ollie ran to the park to meet his friends. ", requiredStart: "ollie ran to the park to meet his friends",
+    sample: "Ollie ran to the park to meet his friends. They were waiting by the swings. They played football and ran around. Then, they saw a small dog under a tree. The dog looked lost, so they gave it some water. Suddenly, a man came and called the dog. It was his dog! The dog ran to him. Ollie and his friends felt happy. Then, they went home. It was a fun day."
+  },
+  {
+    id: "t5", tab: "Task 5: Role Model",
+    title: "TASK 5: Describe your role model / inspirational person.",
+    note: "Thì Hiện tại đơn (Present simple) • Ít nhất 60 từ • Tính từ miêu tả & Adj+Prep",
+    guided: ["Who is the person?", "What does he/she look like?", "What is his/her personality like?", "What does he/she do?", "Why do you like this person?"],
+    tenseHint: "Dùng Present simple (She is, He has, She cooks, helps, listens...)",
+    starter: "My role model is ", requiredStart: "",
+    sample: "My role model is my mother. She is kind and hardworking. She has long black hair and a big smile. She cooks for our family and helps me with my homework. She also listens to me when I feel sad. I love my mother because she helps me every day. She makes me happy. I want to be kind and helpful like her."
+  },
+  {
+    id: "t6", tab: "Task 6: Food Plate",
+    title: "TASK 6: Describe your favorite food plate.",
+    note: "Thì Hiện tại đơn (Present simple) • Ít nhất 60 từ • Từ vựng thực phẩm & sức khỏe",
+    guided: ["What kind of food plate is it? (healthy food plate, breakfast plate...)", "What does it look like?", "What foods are on the plate? (vegetables, fruit, grains, protein, dairy...)", "How does the food taste?", "When do you usually eat this food plate?", "Why do you like this food plate?"],
+    tenseHint: "Dùng Present simple (It has, There are, It tastes, I usually eat...)",
+    starter: "My favorite food plate is ", requiredStart: "",
+    sample: "My favorite food plate is a healthy breakfast plate. It has many colors and looks very fresh. On the plate, there are eggs, bread, tomatoes, and some fruit like bananas and apples. The food tastes soft, sweet and a little salty. I usually eat this plate in the morning before going to school. I like it because it gives me energy for the whole day and it helps me stay strong and healthy."
+  },
+  {
+    id: "b1", tab: "Bonus 1: Talent Show",
+    title: "BONUS (Test 2 - Unit 1): Continue: 'Everyone thought Ben was too shy to speak on stage, until the day the school microphone broke during the talent show...'",
+    note: "Ít nhất 60 từ • Dùng personality adjectives & adj + prepositions (nervous about, proud of...)",
+    guided: ["How did the audience and performers feel when the microphone broke?", "What did Ben do to save the show? (brave, confident, good at...)", "How did the students and teachers react? (surprised at, impressed with...)", "How did Ben feel at the end? (proud of himself, happy with...)"],
+    tenseHint: "Dùng từ nối (so, and, but, because) & tính từ + giới từ (shocked at, proud of, good at...)",
+    starter: "Everyone thought Ben was too shy to speak on stage, until the day the school microphone broke during the talent show. ",
+    requiredStart: "everyone thought ben was too shy to speak on stage",
+    sample: "Everyone thought Ben was too shy to speak on stage, until the day the school microphone broke during the talent show. The performers were very nervous about the silence, and the teachers felt worried about the show. Suddenly, brave Ben stepped forward because he is good at speaking loudly and telling jokes. Everyone was amazed by his confident voice! At the end, the teachers were proud of him, and Ben felt happy with himself."
+  },
+  {
+    id: "b2", tab: "Bonus 2: Camping Trip",
+    title: "BONUS (Test 2 - Unit 2): Write about how to stay healthy and avoid mosquito bites during a summer camping trip.",
+    note: "Ít nhất 60 từ • Dùng ít nhất 2 Quantifiers, 2 Indefinite pronouns & Modal verbs (must, should, needn't...)",
+    guided: ["What healthy foods and drinks should you pack? (less sugar, fewer snacks, lots of water...)", "What clothes must you wear in the forest or jungle?", "How can you protect yourself at night? (mosquito net, repellent, everybody, no one...)"],
+    tenseHint: "Dùng quantifiers (fewer, less, lots of, both, all), indefinite pronouns (everyone, no one) & modals",
+    starter: "When we go on a summer camping trip, everyone needs to stay healthy and safe. ", requiredStart: "",
+    sample: "When we go on a summer camping trip, everyone needs to stay healthy and safe. First, we should pack lots of fresh fruit and plain water, and eat fewer sugary snacks because too much sugar is unhealthy. Second, everybody must wear long-sleeved shirts and long trousers in the forest so mosquitoes cannot bite us. At night, we need to sleep under a mosquito net and use insect repellent, so no one gets sick."
+  }
+];
+
+let writingState = { currentTaskIdx: 0, essays: {}, rewardedTasks: [] };
+function loadWritingState() {
+  try { const raw = localStorage.getItem("leoThapWriting_v1"); if (raw) writingState = { ...writingState, ...JSON.parse(raw) }; } catch (e) {}
+}
+function saveWritingState() { localStorage.setItem("leoThapWriting_v1", JSON.stringify(writingState)); }
+
+function switchMode(mode) {
+  stopRealAudioPlayer();
+  const towerView = document.getElementById("tower-view"), writingView = document.getElementById("writing-view");
+  const tBtn = document.getElementById("tab-tower-btn"), wBtn = document.getElementById("tab-writing-btn");
+  if (mode === "writing") {
+    stopQuestionTimer(); towerView.classList.add("hidden"); writingView.classList.remove("hidden");
+    tBtn.classList.remove("active"); wBtn.classList.add("active"); renderWritingRoom();
+  } else {
+    writingView.classList.add("hidden"); towerView.classList.remove("hidden");
+    wBtn.classList.remove("active"); tBtn.classList.add("active");
+    if (!answeredCurrent && state.clearedFloors.length < 10) startQuestionTimer();
+  }
+}
+
+function renderWritingRoom() {
+  const tabsEl = document.getElementById("w-tabs"); tabsEl.innerHTML = "";
+  WRITING_TASKS.forEach((t, idx) => {
+    const b = document.createElement("button"); b.className = "w-tab";
+    if (idx === writingState.currentTaskIdx) b.classList.add("active");
+    if (writingState.rewardedTasks.includes(t.id)) b.classList.add("done");
+    b.textContent = (writingState.rewardedTasks.includes(t.id) ? "✅ " : "") + t.tab;
+    b.onclick = () => { writingState.currentTaskIdx = idx; saveWritingState(); renderWritingRoom(); };
+    tabsEl.appendChild(b);
+  });
+  document.getElementById("w-progress-badge").textContent = `Đã hoàn thành: ${writingState.rewardedTasks.length} / ${WRITING_TASKS.length}`;
+  const task = WRITING_TASKS[writingState.currentTaskIdx];
+  document.getElementById("w-task-title").textContent = task.title;
+  document.getElementById("w-task-note").textContent = task.note;
+  const gList = document.getElementById("w-guided-list"); gList.innerHTML = "";
+  task.guided.forEach(q => { const li = document.createElement("li"); li.textContent = q; gList.appendChild(li); });
+  const ta = document.getElementById("w-textarea"); ta.value = writingState.essays[task.id] || "";
+  document.getElementById("w-sample-text").textContent = task.sample;
+  document.getElementById("w-sample-box").classList.add("hidden");
+  document.getElementById("w-feedback").innerHTML = "";
+  evaluateWritingLive();
+}
+
+function countWords(str) { const t = str.trim(); return t ? t.split(/\s+/).length : 0; }
+function evaluateWritingLive() {
+  const task = WRITING_TASKS[writingState.currentTaskIdx];
+  const text = document.getElementById("w-textarea").value;
+  const words = countWords(text), lower = text.toLowerCase();
+  const counterEl = document.getElementById("w-word-counter");
+  counterEl.textContent = `${words} / 60 từ`;
+  counterEl.className = `word-counter ${words >= 60 ? "ok" : "low"}`;
+  const conns = ["and", "but", "because", "so", "also", "then", "suddenly", "although", "however", "when", "after", "first"];
+  const foundConns = conns.filter(c => new RegExp(`\\b${c}\\b`, "i").test(text));
+  const hasConnectives = foundConns.length >= 2;
+  const trimmed = text.trim();
+  const hasPunctAndCap = trimmed.length > 0 && /^[A-Z"]/.test(trimmed) && /[.!?"]$/.test(trimmed);
+  const hasStart = !task.requiredStart || lower.trim().startsWith(task.requiredStart);
+  const checks = [
+    { pass: words >= 60, text: `Độ dài tối thiểu 60 từ (hiện có ${words} từ)` },
+    { pass: hasConnectives, text: `Dùng ít nhất 2 từ nối (${foundConns.length ? "đã dùng: " + foundConns.slice(0, 4).join(", ") : "and, but, because, so..."})` },
+    { pass: hasPunctAndCap, text: "Viết hoa đầu bài & có dấu câu (. ! ?) kết thúc" },
+    { pass: true, isInfo: true, text: task.tenseHint }
+  ];
+  if (task.requiredStart) checks.unshift({ pass: hasStart, text: "Mở đầu đúng câu cho sẵn" });
+  const clEl = document.getElementById("w-checklist"); clEl.innerHTML = "";
+  checks.forEach(c => {
+    const div = document.createElement("div"); div.className = "check-item";
+    div.innerHTML = c.isInfo
+      ? `<span class="check-badge cb-wait">💡 Gợi ý</span><span>${c.text}</span>`
+      : `<span class="check-badge ${c.pass ? "cb-pass" : "cb-wait"}">${c.pass ? "✔ Đạt" : "○ Chưa"}</span><span>${c.text}</span>`;
+    clEl.appendChild(div);
+  });
+  return { words, hasConnectives, hasPunctAndCap, hasStart };
+}
+function onWritingInput() {
+  const task = WRITING_TASKS[writingState.currentTaskIdx];
+  writingState.essays[task.id] = document.getElementById("w-textarea").value;
+  saveWritingState(); evaluateWritingLive();
+}
+function insertStarterSentence() {
+  const task = WRITING_TASKS[writingState.currentTaskIdx], ta = document.getElementById("w-textarea");
+  if (!ta.value.trim()) { ta.value = task.starter; onWritingInput(); }
+  ta.focus();
+}
+function toggleSampleWriting() { document.getElementById("w-sample-box").classList.toggle("hidden"); }
+function speakSampleWriting() { speakSampleOnly(WRITING_TASKS[writingState.currentTaskIdx].sample); }
+
+function submitWritingTask() {
+  const task = WRITING_TASKS[writingState.currentTaskIdx], res = evaluateWritingLive(), fb = document.getElementById("w-feedback");
+  if (res.words < 60 || !res.hasConnectives || !res.hasPunctAndCap || !res.hasStart) {
+    sfxFireBreath(); let errs = [];
+    if (!res.hasStart) errs.push("• Cần mở đầu đúng câu quy định.");
+    if (res.words < 60) errs.push(`• Bài viết mới có ${res.words} từ (cần thêm ${60 - res.words} từ nữa).`);
+    if (!res.hasConnectives) errs.push("• Hãy thêm ít nhất 2 từ nối (and, but, because, so, also...).");
+    if (!res.hasPunctAndCap) errs.push("• Nhớ viết hoa chữ cái đầu và đặt dấu chấm (.) cuối bài.");
+    fb.innerHTML = `<div class="feedback-box err"><strong>⚠️ Bài viết chưa đủ tiêu chuẩn nhận thưởng:</strong><br>${errs.join("<br>")}</div>`;
+    return;
+  }
+  let bonusMsg = "Bài viết đã được lưu lại!";
+  if (!writingState.rewardedTasks.includes(task.id)) {
+    writingState.rewardedTasks.push(task.id); state.score += 25;
+    saveProgress(); saveWritingState(); renderHUD(); sfxComboPowerUp();
+    bonusMsg = "Hiệp sĩ được cộng <strong>+25 Điểm Chiến Công</strong>!";
+  } else sfxHintChime();
+  renderWritingRoom();
+  document.getElementById("w-feedback").innerHTML = `<div class="feedback-box ok">🎉 <strong>XUẤT SẮC! Đạt trọn vẹn Checklist (${res.words} từ)!</strong><br>⚔️ ${bonusMsg}</div>`;
+}
+
+// ================= SETTINGS & TOWER LOGIC =================
+let settings = { timePerQuestion: 30, comboMode: "auto" };
+let state = { floorIdx: 0, hearts: 3, monsterHP: 100, score: 0, hints: 0, combo: 0, clearedFloors: [] };
+let qList = [], qResults = [], qIdx = 0;
+let answeredCurrent = false, usedHintCurrent = false, finishingMode = false;
+let timerInterval = null, timeLeft = 30, timerPaused = false;
+
+function loadSettings() {
+  try { const raw = localStorage.getItem("leoThapProSettings_v2"); if (raw) settings = { ...settings, ...JSON.parse(raw) }; } catch (e) {}
+  syncSettingsUI();
+}
+function saveSettings() { localStorage.setItem("leoThapProSettings_v2", JSON.stringify(settings)); }
+function syncSettingsUI() {
+  document.getElementById("tb-time-badge").textContent = settings.timePerQuestion > 0 ? `${settings.timePerQuestion}s` : "∞";
+  document.getElementById("custom-time-input").value = settings.timePerQuestion;
+  document.getElementById("combo-mode").value = settings.comboMode;
+  document.querySelectorAll("#time-presets .preset-btn").forEach(btn => {
+    const val = parseInt(btn.getAttribute("onclick").match(/\d+/)[0], 10);
+    btn.classList.toggle("active", val === settings.timePerQuestion);
+  });
+}
+function openSettings() { timerPaused = true; syncSettingsUI(); document.getElementById("settings-modal").classList.remove("hidden"); }
+function closeSettings() {
+  document.getElementById("settings-modal").classList.add("hidden"); timerPaused = false;
+  if (!answeredCurrent && state.clearedFloors.length < 10 && !document.getElementById("tower-view").classList.contains("hidden")) {
+    if (settings.timePerQuestion === 0) { stopQuestionTimer(); renderTimerUI(); }
+    else if (!timerInterval) startQuestionTimer();
+  }
+}
+function setPresetTime(sec) { settings.timePerQuestion = sec; saveSettings(); syncSettingsUI(); if (!answeredCurrent) { timeLeft = sec; renderTimerUI(); } }
+function applyCustomTime(val) {
+  let n = parseInt(val, 10); if (isNaN(n) || n < 0) n = 0; if (n > 300) n = 300;
+  settings.timePerQuestion = n; saveSettings(); syncSettingsUI(); if (!answeredCurrent) { timeLeft = n; renderTimerUI(); }
+}
+function updateSettingsState() { settings.comboMode = document.getElementById("combo-mode").value || "auto"; saveSettings(); }
+
+function stopQuestionTimer() { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } }
+function startQuestionTimer() {
+  stopQuestionTimer(); timeLeft = settings.timePerQuestion; renderTimerUI();
+  if (settings.timePerQuestion <= 0) return;
+  timerInterval = setInterval(() => {
+    if (timerPaused || isListeningAudioPlaying || answeredCurrent) return;
+    timeLeft--;
+    if (timeLeft <= 5 && timeLeft > 0) sfxTick();
+    renderTimerUI();
+    if (timeLeft <= 0) { stopQuestionTimer(); handleTimeout(); }
+  }, 1000);
+}
+function renderTimerUI() {
+  const lbl = document.getElementById("timer-label"), fill = document.getElementById("timer-fill");
+  if (settings.timePerQuestion <= 0) {
+    lbl.textContent = "⏳ ∞"; lbl.className = "timer-label";
+    fill.style.width = "100%"; fill.style.backgroundColor = "#10b981"; return;
+  }
+  const pct = Math.max(0, (timeLeft / settings.timePerQuestion) * 100);
+  lbl.textContent = `⏳ ${timeLeft}s`; fill.style.width = `${pct}%`;
+  if (timeLeft <= 5) { lbl.className = "timer-label crit"; fill.style.backgroundColor = "#ef4444"; }
+  else if (pct <= 50) { lbl.className = "timer-label warn"; fill.style.backgroundColor = "#fbbf24"; }
+  else { lbl.className = "timer-label"; fill.style.backgroundColor = "#38bdf8"; }
+}
+function handleTimeout() {
+  if (answeredCurrent) return;
+  answeredCurrent = true; stopRealAudioPlayer();
+  const item = qList[qIdx];
+  if (item.type === "mcq") {
+    document.querySelectorAll(".opt-btn").forEach(b => { b.disabled = true; if (b.textContent.slice(3) === item.ans) b.classList.add("right-ans"); });
+  } else {
+    document.getElementById("boss-input").disabled = true; document.getElementById("boss-atk-btn").disabled = true; document.getElementById("boss-hint-btn").disabled = true;
+  }
+  qResults[qIdx] = "err"; state.combo = 0; if (state.hearts > 0) state.hearts--;
+  state.score = Math.max(0, state.score - 5); playMonsterFireAnim();
+  const rightTxt = item.type === "mcq" ? item.ans : item.ans.join(" / ");
+  document.getElementById("fb-slot").innerHTML = `<div class="feedback-box err">⏰ <strong>HẾT GIỜ! Bị quái vật phun lửa! (-1 ❤️, -5 điểm)</strong><br>👉 Đáp án đúng: <strong>${rightTxt}</strong><br>📖 ${item.exp}</div>`;
+  finalizeTurnUI();
+}
+
+function shuffle(arr) { const c = [...arr]; for (let i = c.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [c[i], c[j]] = [c[j], c[i]]; } return c; }
+function saveProgress() { localStorage.setItem("leoThapPixelPro_v2", JSON.stringify(state)); }
+function loadProgress() {
+  try { const raw = localStorage.getItem("leoThapPixelPro_v2"); if (raw) { const p = JSON.parse(raw); if (p && typeof p.floorIdx === "number") state = { ...state, ...p, hearts: 3, monsterHP: 100 }; } } catch (e) {}
+}
+function spawnEmbers() {
+  const arena = document.getElementById("arena"); arena.querySelectorAll(".ambient-ember").forEach(e => e.remove());
+  for (let i = 0; i < 8; i++) {
+    const em = document.createElement("div"); em.className = "ambient-ember";
+    em.style.left = `${10 + Math.random() * 80}%`; em.style.bottom = `${10 + Math.random() * 35}px`;
+    em.style.animationDuration = `${2.2 + Math.random() * 2.5}s`; em.style.animationDelay = `${Math.random() * 2}s`;
+    arena.appendChild(em);
+  }
+}
+function initFloor(shuffleAll = false) {
+  stopQuestionTimer(); stopRealAudioPlayer();
+  const f = FLOORS[state.floorIdx];
+  const mcqs = (shuffleAll ? shuffle(f.mcq) : f.mcq).map(q => ({ ...q, type: "mcq", opts: shuffleAll ? shuffle(q.opts) : [...q.opts] }));
+  const bosses = (shuffleAll ? shuffle(f.boss) : f.boss).map(q => ({ ...q, type: "boss" }));
+  qList = [...mcqs, ...bosses]; qResults = Array(qList.length).fill(null); qIdx = 0;
+  answeredCurrent = false; usedHintCurrent = false; finishingMode = false;
+  state.hearts = 3; state.monsterHP = 100;
+  spawnEmbers(); renderAll();
+}
+function renderAll() { renderHUD(); renderArena(); renderQuestionPanel(); }
+
+function renderHUD() {
+  const fNum = Math.min(state.floorIdx + 1, 10);
+  document.getElementById("hud-floor").textContent = `Tầng ${fNum} / 10`;
+  document.getElementById("hud-hearts").textContent = `${"❤️".repeat(state.hearts)}${"🖤".repeat(3 - state.hearts)} (${state.hearts}/3)`;
+  document.getElementById("hud-score").textContent = `${state.score} điểm`;
+  document.getElementById("hud-combo").textContent = `🃏 ${state.hints} | 🔥 ${state.combo}/5`;
+  const mapEl = document.getElementById("tower-map"); mapEl.innerHTML = "";
+  for (let i = 0; i < 10; i++) {
+    const d = document.createElement("div"); d.className = "floor-pill";
+    if (state.clearedFloors.includes(i)) { d.classList.add("done"); d.textContent = `✅ T${i + 1}`; }
+    else if (i === state.floorIdx && state.clearedFloors.length < 10) { d.classList.add("active"); d.textContent = `⚔️ T${i + 1}`; }
+    else { d.textContent = `🔒 T${i + 1}`; }
+    mapEl.appendChild(d);
+  }
+}
+function updateHPBars() {
+  const hPct = `${(state.hearts / 3) * 100}%`, mPct = `${state.monsterHP}%`;
+  document.getElementById("hero-hp-text").textContent = `${state.hearts} / 3 ❤️`;
+  document.getElementById("hero-hp-bar").style.width = hPct; document.getElementById("hero-hp-trail").style.width = hPct;
+  document.getElementById("monster-hp-text").textContent = `${state.monsterHP} / 100 HP`;
+  document.getElementById("monster-hp-bar").style.width = mPct; document.getElementById("monster-hp-trail").style.width = mPct;
+}
+function renderArena() {
+  if (state.clearedFloors.length >= 10) return;
+  const f = FLOORS[state.floorIdx];
+  document.getElementById("monster-name-label").textContent = `👾 ${f.monster.toUpperCase()}`;
+  updateHPBars();
+  document.getElementById("hero-sprite").innerHTML = `<div class="sprite-shadow"></div>${HERO_SPRITE}`;
+  const mWrap = document.getElementById("monster-sprite"); mWrap.className = "sprite-wrap monster-idle";
+  mWrap.innerHTML = `<div class="sprite-shadow"></div>${makePixelSVG(MONSTER_GRIDS[state.floorIdx], MONSTER_PALETTES[state.floorIdx], 90)}`;
+}
+
+function spawnParticles(xPercent, yBottom, colors, count = 12) {
+  const stage = document.getElementById("stage-sprites");
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement("div"); p.className = "px-particle";
+    p.style.background = colors[i % colors.length];
+    p.style.left = `${xPercent + (Math.random() * 6 - 3)}%`; p.style.bottom = `${yBottom + (Math.random() * 24 - 12)}px`;
+    p.style.setProperty("--dx", `${(Math.random() - 0.5) * 90}px`); p.style.setProperty("--dy", `${(Math.random() - 0.7) * 85}px`);
+    stage.appendChild(p); setTimeout(() => p.remove(), 580);
+  }
+}
+function spawnFloatText(targetId, text, color) {
+  const parent = document.getElementById(targetId), el = document.createElement("div");
+  el.className = "float-dmg"; el.style.color = color; el.textContent = text;
+  parent.appendChild(el); setTimeout(() => el.remove(), 980);
+}
+function shakeArena() {
+  const a = document.getElementById("arena"); a.classList.remove("arena-shake"); void a.offsetWidth; a.classList.add("arena-shake");
+}
+function playHeroAttackAnim(isCrit, gotReward) {
+  sfxHeroSlash(isCrit);
+  const hero = document.getElementById("hero-sprite"), monster = document.getElementById("monster-sprite"), stage = document.getElementById("stage-sprites");
+  hero.classList.remove("hero-idle"); hero.classList.add("hero-charge");
+  setTimeout(() => { hero.classList.remove("hero-charge"); hero.classList.add(isCrit ? "hero-dash-crit" : "hero-dash"); }, 70);
+  setTimeout(() => {
+    const slash = document.createElement("div"); slash.className = isCrit ? "fx-slash-crit" : "fx-slash";
+    slash.innerHTML = isCrit ? CRIT_SLASH_SVG : SLASH_SVG; stage.appendChild(slash);
+    monster.classList.add("monster-hit"); shakeArena();
+    spawnParticles(78, 42, isCrit ? ["#fbbf24","#ffffff","#f97316"] : ["#38bdf8","#ffffff","#7dd3fc"], isCrit ? 16 : 10);
+    spawnFloatText("monster-sprite", isCrit ? "CRIT -10 HP!" : "-10 HP!", isCrit ? "#fbbf24" : "#7dd3fc");
+    setTimeout(() => slash.remove(), 420);
+  }, 190);
+  setTimeout(() => {
+    hero.classList.remove("hero-dash", "hero-dash-crit"); hero.classList.add("hero-idle"); monster.classList.remove("monster-hit");
+    if (gotReward) {
+      sfxComboPowerUp(); hero.classList.add("hero-heal");
+      spawnParticles(18, 45, ["#10b981","#fbbf24","#ffffff"], 14); spawnFloatText("hero-sprite", "COMBO x5!", "#6ee7b7");
+      setTimeout(() => hero.classList.remove("hero-heal"), 550);
+    }
+    if (state.monsterHP <= 0) {
+      monster.classList.remove("monster-idle"); monster.classList.add("monster-dead");
+      spawnParticles(78, 45, ["#ef4444","#fbbf24","#ffffff","#94a3b8"], 22); sfxMonsterDie();
+    }
+  }, 560);
+}
+function playMonsterFireAnim() {
+  sfxFireBreath();
+  const hero = document.getElementById("hero-sprite"), monster = document.getElementById("monster-sprite"), stage = document.getElementById("stage-sprites");
+  monster.classList.remove("monster-idle"); monster.classList.add("monster-windup");
+  setTimeout(() => {
+    monster.classList.remove("monster-windup"); monster.classList.add("monster-lunge");
+    const fire = document.createElement("div"); fire.className = "fx-fireball"; fire.innerHTML = FIREBALL_SVG; stage.appendChild(fire);
+    [0, 120, 240].forEach((d, idx) => setTimeout(() => spawnParticles(65 - idx * 18, 48, ["#f97316","#fde047","#ef4444"], 5), d));
+    setTimeout(() => {
+      fire.remove(); hero.classList.add("hero-knockback"); shakeArena();
+      spawnParticles(18, 44, ["#ef4444","#f97316","#fde047"], 15); spawnFloatText("hero-sprite", "-1 ❤️  -5đ", "#fca5a5");
+      if (state.hearts <= 0) sfxDefeat();
+    }, 360);
+  }, 110);
+  setTimeout(() => { monster.classList.remove("monster-lunge"); monster.classList.add("monster-idle"); hero.classList.remove("hero-knockback"); }, 720);
+}
+
+function renderQuestionPanel() {
+  stopQuestionTimer(); stopRealAudioPlayer();
+  if (state.clearedFloors.length >= 10) {
+    document.getElementById("game-card").classList.add("hidden"); document.getElementById("arena").classList.add("hidden");
+    document.getElementById("victory-card").classList.remove("hidden");
+    document.getElementById("victory-hero-wrap").innerHTML = HERO_SPRITE;
+    document.getElementById("final-score-text").textContent = `Tổng điểm chiến công: ${state.score} điểm`; return;
+  }
+  document.getElementById("game-card").classList.remove("hidden");
+  document.getElementById("arena").classList.remove("hidden");
+  document.getElementById("victory-card").classList.add("hidden");
+
+  const f = FLOORS[state.floorIdx], item = qList[qIdx];
+  document.getElementById("floor-title").textContent = `🗼 ${f.title}`;
+  document.getElementById("floor-topic").textContent = f.topic;
+  document.getElementById("q-counter").textContent = finishingMode ? `⚡ Đòn Kết Liễu (${state.monsterHP} HP)` : `Câu ${qIdx + 1} / ${qList.length}`;
+
+  const pipsEl = document.getElementById("q-pips"); pipsEl.innerHTML = "";
+  qList.forEach((_, idx) => {
+    const p = document.createElement("div"); p.className = "pip";
+    if (qResults[idx] === "ok") { p.classList.add("ok"); p.textContent = "✓"; }
+    else if (qResults[idx] === "err") { p.classList.add("err"); p.textContent = "✗"; }
+    else if (idx === qIdx) { p.classList.add("curr"); p.textContent = idx + 1; }
+    else { p.textContent = idx + 1; }
+    pipsEl.appendChild(p);
+  });
+
+  const area = document.getElementById("question-area"); area.innerHTML = "";
+  const badges = document.createElement("div"); badges.className = "badges-row";
+  const tag = document.createElement("span");
+  if (finishingMode) { tag.className = "stage-tag tag-finish"; tag.textContent = "⚡ ĐÒN KẾT LIỄU"; }
+  else if (item.type === "mcq") { tag.className = "stage-tag tag-monster"; tag.textContent = `👾 Quái Thường (${qIdx + 1}/6)`; }
+  else { tag.className = "stage-tag tag-boss"; tag.textContent = `🐉 Pha Boss (${qIdx + 1}/10)`; }
+  badges.appendChild(tag);
+
+  const diffTag = document.createElement("span");
+  diffTag.className = `stage-tag ${item.diff === "hard" ? "tag-hard" : "tag-easy"}`;
+  diffTag.textContent = item.diff === "hard" ? "🔥 ĐỘ KHÓ: CAO (DOK 2-3)" : "🌱 KHỞI ĐỘNG";
+  badges.appendChild(diffTag);
+  if (item.listenReal) {
+    const lTag = document.createElement("span"); lTag.className = "stage-tag tag-listen"; lTag.textContent = "🎧 FILE NGHE GỐC";
+    badges.appendChild(lTag);
+  }
+  area.appendChild(badges);
+
+  // REAL AUDIO PLAYER (NO TTS GENERATION)
+  if (item.listenReal) {
+    const lBox = document.createElement("div"); lBox.className = "listen-box";
+    lBox.innerHTML = `
+      <div class="listen-top">
+        <strong style="color:#93c5fd; font-size:13.5px;">🎧 Trình phát File Nghe Gốc (${hasCustomAudio ? realAudioName : "Chưa chọn / tự tìm listening.mp3"})</strong>
+        <button class="listen-pick-btn" onclick="document.getElementById('global-audio-picker').click()">📂 Chọn File Nghe từ máy</button>
+      </div>
+      <audio id="real-listening-player" class="listen-audio-el" controls src="${realAudioSrc}" preload="auto"></audio>
+      <div class="listen-status" id="listen-status">Bấm ▶ để nghe nguyên file gốc (đồng hồ đếm ngược & nhạc nền tự tạm dừng lúc nghe).</div>
+    `;
+    area.appendChild(lBox);
+
+    const audioEl = lBox.querySelector("#real-listening-player");
+    const statusEl = lBox.querySelector("#listen-status");
+    audioEl.onplay = () => {
+      isListeningAudioPlaying = true;
+      statusEl.textContent = "🔊 Đang phát file nghe gốc... (Đồng hồ tạm dừng)";
+      statusEl.style.color = "#6ee7b7";
+    };
+    audioEl.onpause = () => {
+      isListeningAudioPlaying = false;
+      if (!audioEl.ended) statusEl.textContent = "⏸️ Đã tạm dừng. Hãy tiếp tục nghe hoặc chọn đáp án.";
+    };
+    audioEl.onended = () => {
+      isListeningAudioPlaying = false;
+      statusEl.textContent = "✔ Đã phát hết file nghe! Hãy trả lời câu hỏi.";
+    };
+    audioEl.onerror = () => {
+      isListeningAudioPlaying = false;
+      statusEl.textContent = "⚠️ Chưa tìm thấy file listening.mp3 cùng thư mục! Hãy bấm nút '📂 Chọn File Nghe từ máy' ở trên.";
+      statusEl.style.color = "#fbbf24";
+    };
+  }
+
+  if (item.context) {
+    const cBox = document.createElement("div"); cBox.className = "context-box"; cBox.textContent = item.context;
+    area.appendChild(cBox);
+  }
+
+  const qText = document.createElement("div"); qText.className = "question-text";
+  qText.innerHTML = item.q.replace("______", `<span class="blank">______</span>`);
+  area.appendChild(qText);
+
+  if (item.type === "mcq") {
+    const optsDiv = document.createElement("div"); optsDiv.className = "options";
+    const letters = ["A", "B", "C", "D"];
+    item.opts.forEach((opt, i) => {
+      const btn = document.createElement("button"); btn.className = "opt-btn";
+      btn.textContent = `${letters[i]}. ${opt}`;
+      btn.onclick = () => handleAnswer(opt, btn);
+      optsDiv.appendChild(btn);
+    });
+    area.appendChild(optsDiv);
+  } else {
+    const row = document.createElement("div"); row.className = "boss-row";
+    const inp = document.createElement("input"); inp.type = "text"; inp.className = "fill-input"; inp.id = "boss-input";
+    inp.placeholder = "Gõ chính xác 1 từ tiếng Anh rồi nhấn Enter..."; inp.autocomplete = "off";
+    inp.onkeydown = (e) => { if (e.key === "Enter") handleBossSubmit(); };
+    row.appendChild(inp);
+
+    const atkBtn = document.createElement("button"); atkBtn.className = "btn-attack"; atkBtn.id = "boss-atk-btn";
+    atkBtn.textContent = "⚔️ Tấn Công!"; atkBtn.onclick = handleBossSubmit; row.appendChild(atkBtn);
+
+    const hBtn = document.createElement("button"); hBtn.className = "btn-hint"; hBtn.id = "boss-hint-btn";
+    hBtn.textContent = `🃏 Gợi Ý (${state.hints})`; hBtn.disabled = state.hints <= 0 || usedHintCurrent;
+    hBtn.onclick = useBossHint; row.appendChild(hBtn);
+
+    area.appendChild(row);
+    const hMsg = document.createElement("div"); hMsg.id = "boss-hint-msg";
+    hMsg.style.cssText = "margin-top:8px; font-size:13px; color:var(--accent); font-weight:700;";
+    area.appendChild(hMsg);
+    setTimeout(() => inp.focus(), 50);
+  }
+
+  const fbSlot = document.createElement("div"); fbSlot.id = "fb-slot"; area.appendChild(fbSlot);
+  const nextSlot = document.createElement("div"); nextSlot.id = "next-slot"; area.appendChild(nextSlot);
+  startQuestionTimer();
+}
+
+function useBossHint() {
+  if (answeredCurrent || state.hints <= 0 || usedHintCurrent) return;
+  sfxHintChime(); state.hints--; usedHintCurrent = true;
+  const firstChar = qList[qIdx].ans[0][0].toUpperCase();
+  document.getElementById("boss-hint-msg").textContent = `💡 Thẻ Gợi Ý: Chữ cái đầu tiên là "${firstChar}"`;
+  document.getElementById("boss-hint-btn").disabled = true;
+  document.getElementById("boss-hint-btn").textContent = `🃏 Gợi Ý (${state.hints})`;
+  renderHUD(); saveProgress();
+}
+
+function handleBossSubmit() {
+  if (answeredCurrent) return;
+  const inp = document.getElementById("boss-input"), val = (inp.value || "").trim();
+  if (!val) { inp.focus(); return; }
+  handleAnswer(val, null);
+}
+
+function handleAnswer(userVal, clickedBtn) {
+  if (answeredCurrent) return;
+  answeredCurrent = true; stopQuestionTimer(); stopRealAudioPlayer();
+  if (bgmEnabled && !bgmStarted) startBGMLoop();
+
+  const item = qList[qIdx]; let isCorrect = false;
+  if (item.type === "mcq") {
+    isCorrect = userVal === item.ans;
+    document.querySelectorAll(".opt-btn").forEach(b => {
+      b.disabled = true; const bVal = b.textContent.slice(3);
+      if (bVal === item.ans) b.classList.add("right-ans");
+      else if (b === clickedBtn && !isCorrect) b.classList.add("wrong-ans");
+    });
+  } else {
+    const norm = userVal.toLowerCase().replace(/\s+/g, " ");
+    isCorrect = item.ans.some(a => a.toLowerCase() === norm);
+    document.getElementById("boss-input").disabled = true;
+    document.getElementById("boss-atk-btn").disabled = true;
+    document.getElementById("boss-hint-btn").disabled = true;
+  }
+
+  let rewardMsg = "", gotReward = false;
+  const fbSlot = document.getElementById("fb-slot");
+  if (isCorrect) {
+    qResults[qIdx] = "ok"; state.monsterHP = Math.max(0, state.monsterHP - 10); state.score += 10; state.combo++;
+    if (state.combo >= 5) {
+      state.combo = 0; gotReward = true;
+      if (settings.comboMode === "auto" && state.hearts < 3) { state.hearts++; rewardMsg = `<br>🔥 <strong>COMBO x5!</strong> Hiệp sĩ được hồi +1 ❤️ Trái Tim!`; }
+      else { state.hints++; rewardMsg = `<br>🔥 <strong>COMBO x5!</strong> Nhận thêm +1 🃏 Thẻ Gợi Ý!`; }
+    }
+    playHeroAttackAnim(item.type === "boss", gotReward);
+    fbSlot.innerHTML = `<div class="feedback-box ok">✅ <strong>${item.type === "boss" ? "Đòn Chí Mạng!" : "Chính xác!"} Quái vật -10 HP (+10 điểm)!</strong><br>📖 ${item.exp}${rewardMsg}</div>`;
+  } else {
+    qResults[qIdx] = "err"; state.combo = 0;
+    if (state.hearts > 0) state.hearts--;
+    state.score = Math.max(0, state.score - 5);
+    playMonsterFireAnim();
+    const rightTxt = item.type === "mcq" ? item.ans : item.ans.join(" / ");
+    fbSlot.innerHTML = `<div class="feedback-box err">🔥 <strong>Bị quái vật phun lửa! (-1 ❤️, -5 điểm)</strong><br>👉 Đáp án đúng: <strong>${rightTxt}</strong><br>📖 ${item.exp}</div>`;
+  }
+  finalizeTurnUI();
+}
+
+function finalizeTurnUI() {
+  renderHUD(); updateHPBars();
+  const nextSlot = document.getElementById("next-slot"); nextSlot.className = "next-wrap";
+  if (state.hearts <= 0) {
+    nextSlot.innerHTML = `<button class="btn-big btn-retry" onclick="retryFloor()">💀 Hiệp sĩ đã gục ngã! Hồi sinh & Đánh lại Tầng ${state.floorIdx + 1} (Đề xáo trộn)</button>`;
+  } else if (state.monsterHP <= 0) {
+    if (!state.clearedFloors.includes(state.floorIdx)) state.clearedFloors.push(state.floorIdx);
+    saveProgress();
+    if (state.floorIdx < 9) nextSlot.innerHTML = `<button class="btn-big btn-clear" onclick="nextFloor()">💀 Quái vật đã bị tiêu diệt! Tiến lên Tầng ${state.floorIdx + 2} ➡️</button>`;
+    else nextSlot.innerHTML = `<button class="btn-big btn-clear" onclick="renderQuestionPanel()">🏆 Đã hạ Rồng Lửa! Lên Đỉnh Tháp Nhận Cúp!</button>`;
+  } else {
+    nextSlot.innerHTML = `<button class="btn-big btn-next" onclick="advanceQuestion()">➡️ Tiếp tục tấn công</button>`;
+  }
+}
+
+function advanceQuestion() {
+  answeredCurrent = false; usedHintCurrent = false;
+  if (qIdx + 1 < qList.length && !finishingMode) qIdx++;
+  else {
+    finishingMode = true;
+    const missedIndices = [];
+    qResults.forEach((r, i) => { if (r !== "ok") missedIndices.push(i); });
+    if (missedIndices.length > 0) {
+      const pick = missedIndices[Math.floor(Math.random() * missedIndices.length)];
+      if (qList[pick].type === "mcq") qList[pick].opts = shuffle(qList[pick].opts);
+      qIdx = pick;
+    } else qIdx = Math.floor(Math.random() * qList.length);
+  }
+  renderQuestionPanel();
+}
+function retryFloor() { initFloor(true); }
+function nextFloor() { state.floorIdx++; saveProgress(); initFloor(false); window.scrollTo({ top: 0, behavior: "smooth" }); }
+function resetGame() {
+  if (!confirm("Bạn muốn chơi lại Leo Tháp từ Tầng 1?")) return;
+  localStorage.removeItem("leoThapPixelPro_v2");
+  state = { floorIdx: 0, hearts: 3, monsterHP: 100, score: 0, hints: 0, combo: 0, clearedFloors: [] };
+  initFloor(false);
+}
+
+loadSettings();
+loadProgress();
+loadWritingState();
+initFloor(false);
+</script>
+</body>
+</html>
